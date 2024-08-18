@@ -1,8 +1,10 @@
 package it.uniroma2.dicii.bd.model.dao;
 
 import it.uniroma2.dicii.bd.exception.DAOException;
+import it.uniroma2.dicii.bd.exception.LoginException;
 import it.uniroma2.dicii.bd.model.domain.Credentials;
 import it.uniroma2.dicii.bd.model.domain.Role;
+import it.uniroma2.dicii.bd.utils.Printer;
 
 import java.sql.*;
 
@@ -34,6 +36,7 @@ public class LoginProcedureDAO implements GenericProcedureDAO<Credentials> {
 
             //Il ruolo dell'utente viene recuperato dal terzo parametro di output
             role = cs.getInt(3);  //restituisce un intero che è mio ruolo utente
+            Printer.println("Tipo di ruolo: " + role);
         } catch(SQLException e) {
             throw new DAOException("Login error: " + e.getMessage());
         }
