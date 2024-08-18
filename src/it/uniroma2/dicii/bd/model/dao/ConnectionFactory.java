@@ -40,7 +40,9 @@ public class ConnectionFactory {
 
             String connection_url = properties.getProperty("CONNECTION_URL");
             String user = properties.getProperty(role.name() + "_USER");
+            System.out.println("loggato come:  " + user);
             String pass = properties.getProperty(role.name() + "_PASS");
+            System.out.println("Password è:  " + pass);
 
             connection = DriverManager.getConnection(connection_url, user, pass);
         } catch (IOException | SQLException e) {
