@@ -13,13 +13,13 @@ public class LoginController implements Controller {
     @Override
     public void start() {
         try {
-            cred = LoginView.authenticate();
+            cred = LoginView.authenticate();    //controller chiama view per prendere i dati
         } catch(IOException e) {
             throw new RuntimeException(e);
         }
 
         try {
-            // per ottenere i credenziali
+            // per ottenere i credenziali con il ruolo restituito, controller chiama DAO per ottenere ruolo
             cred = new LoginProcedureDAO().execute(cred.getUsername(), cred.getPassword());
         } catch(DAOException e) {
             throw new RuntimeException(e);
@@ -28,6 +28,6 @@ public class LoginController implements Controller {
 
     public Credentials getCred() {
         return cred;
-    }
+    }  //contiene i credenziali: CF, password, ruolo
 }
 

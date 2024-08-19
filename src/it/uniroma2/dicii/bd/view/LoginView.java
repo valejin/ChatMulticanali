@@ -11,12 +11,12 @@ public class LoginView {
     public static Credentials authenticate() throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         Printer.print("CF: ");
-        String username = reader.readLine();
-        Printer.println("valore CF inserito: " + username);
+        String cf = reader.readLine();
+        Printer.println("valore CF inserito: " + cf);
         Printer.print("password: ");
         String password = reader.readLine();
         Printer.println("valore password inserito: " + password);
 
-        return new Credentials(username, password, null);
+        return new Credentials(cf, password, null);
     }
 }

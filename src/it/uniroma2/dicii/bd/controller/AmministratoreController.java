@@ -1,7 +1,10 @@
 package it.uniroma2.dicii.bd.controller;
 
+import it.uniroma2.dicii.bd.bean.ProgettoBean;
 import it.uniroma2.dicii.bd.model.dao.ConnectionFactory;
+import it.uniroma2.dicii.bd.model.dao.InserisciProgettoDAO;
 import it.uniroma2.dicii.bd.model.domain.Role;
+import it.uniroma2.dicii.bd.utils.Printer;
 import it.uniroma2.dicii.bd.view.AmministratoreView;
 
 import java.io.IOException;
@@ -27,7 +30,7 @@ public class AmministratoreController implements Controller {
             }
 
             switch(choice) {
-                //case 1 -> inserisciProgetto();
+                case 1 -> inserisciProgetto();
                 //case 2 -> assegnaCapoprogetto();
                 //case 3 -> stampaLista();
                 case 0 -> System.exit(0);
@@ -37,4 +40,28 @@ public class AmministratoreController implements Controller {
 
 
     }
+
+
+
+    public void inserisciProgetto(){
+        //quando inserisco uso bean per passare i dati
+
+        ProgettoBean progettoNew = new ProgettoBean();
+
+        try{
+            progettoNew = AmministratoreView.inserisciProgetto();
+            new InserisciProgettoDAO().execute(progettoNew);
+
+            Printer.println("\nProgetto inserito con successo!");
+
+        } catch(SQLException e){
+            Printer.errorMessage("Errore durante l'inserimento del progetto: " + e.getLocalizedMessage());
+        }
+
+
+    }
+
+
+
+
 }

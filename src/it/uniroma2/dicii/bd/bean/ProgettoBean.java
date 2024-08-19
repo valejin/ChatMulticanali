@@ -1,11 +1,13 @@
 package it.uniroma2.dicii.bd.bean;
 
+import java.sql.Date;
+
 public class ProgettoBean {
 
     private int idProgetto;
     private String nome;
-    private String dataInizio;
-    private String dataScadenza;
+    private java.sql.Date dataInizio;
+    private java.sql.Date dataScadenza;
     private String CFcapo;
 
     public int getIdProgetto() {
@@ -24,19 +26,19 @@ public class ProgettoBean {
         this.nome = nome;
     }
 
-    public String getDataInizio() {
+    public java.sql.Date getDataInizio() {
         return dataInizio;
     }
 
-    public void setDataInizio(String dataInizio) {
+    public void setDataInizio(java.sql.Date dataInizio) {
         this.dataInizio = dataInizio;
     }
 
-    public String getDataScadenza() {
+    public java.sql.Date getDataScadenza() {
         return dataScadenza;
     }
 
-    public void setDataScadenza(String dataScadenza) {
+    public void setDataScadenza(Date dataScadenza) {
         this.dataScadenza = dataScadenza;
     }
 
