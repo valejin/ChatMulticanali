@@ -1,7 +1,8 @@
-package it.uniroma2.dicii.bd.model.dao;
+package it.uniroma2.dicii.bd.model.dao.amministratore;
 
 import it.uniroma2.dicii.bd.bean.ProgettoBean;
 import it.uniroma2.dicii.bd.exception.DAOException;
+import it.uniroma2.dicii.bd.model.dao.ConnectionFactory;
 import it.uniroma2.dicii.bd.model.domain.Credentials;
 
 import java.sql.CallableStatement;

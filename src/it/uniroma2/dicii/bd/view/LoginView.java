@@ -17,6 +17,6 @@ public class LoginView {
         String password = reader.readLine();
         Printer.println("valore password inserito: " + password);
 
-        return new Credentials(cf, password, null);
+        return new Credentials(cf, password, null, null);
     }
 }

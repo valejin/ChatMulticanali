@@ -1,14 +1,18 @@
 package it.uniroma2.dicii.bd.controller;
 
 import it.uniroma2.dicii.bd.bean.ProgettoBean;
+import it.uniroma2.dicii.bd.model.CapoProgetto;
+import it.uniroma2.dicii.bd.model.Progetto;
 import it.uniroma2.dicii.bd.model.dao.ConnectionFactory;
-import it.uniroma2.dicii.bd.model.dao.InserisciProgettoDAO;
+import it.uniroma2.dicii.bd.model.dao.amministratore.AssegnaCapoProgettoDAO;
+import it.uniroma2.dicii.bd.model.dao.amministratore.InserisciProgettoDAO;
 import it.uniroma2.dicii.bd.model.domain.Role;
 import it.uniroma2.dicii.bd.utils.Printer;
 import it.uniroma2.dicii.bd.view.AmministratoreView;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 public class AmministratoreController implements Controller {
 
@@ -31,8 +35,15 @@ public class AmministratoreController implements Controller {
 
             switch(choice) {
                 case 1 -> inserisciProgetto();
-                //case 2 -> assegnaCapoprogetto();
-                //case 3 -> stampaLista();
+                case 2 -> {
+                    try {
+                        assegnaCapoprogetto();
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                //case 3 -> stampaLista();    //progetti senza capo
+                //case 4 -> stampaListaConCapo();
                 case 0 -> System.exit(0);
                 default -> throw new RuntimeException("Invalid choice");
             }
@@ -42,11 +53,11 @@ public class AmministratoreController implements Controller {
     }
 
 
-
+/*------------ Metodo per inserire un nuovo progetto */
     public void inserisciProgetto(){
         //quando inserisco uso bean per passare i dati
 
-        ProgettoBean progettoNew = new ProgettoBean();
+        ProgettoBean progettoNew;
 
         try{
             progettoNew = AmministratoreView.inserisciProgetto();
@@ -58,8 +69,98 @@ public class AmministratoreController implements Controller {
             Printer.errorMessage("Errore durante l'inserimento del progetto: " + e.getLocalizedMessage());
         }
 
+    }
+
+
+
+/*------------ Metodo per assegnare un capo progetto a un progetto esistente */
+    public void assegnaCapoprogetto() throws SQLException {
+
+        Object[] risultato = null;
+        try {
+            risultato = AmministratoreView.assegnaCapoProgetto();
+        } catch (SQLException e) {
+            // Gestisci l'eccezione generata dal metodo assegnaCapoProgetto
+            Printer.errorMessage("Errore durante l'assegnazione del capo progetto: " + e.getMessage());
+            return;  // Esci dal metodo se c'è stato un errore
+        }
+
+        int idProgetto = -1;
+        CapoProgetto capoProgetto = null;
+
+        if (risultato != null) {
+            idProgetto = (int) risultato[0];
+            capoProgetto = (CapoProgetto) risultato[1];
+        }
+
+        String cfCapo = capoProgetto.getCf();
+
+        // Devo inserire cf di capoProgetto in colonna CapoProgetto di Progetto
+        try {
+            AssegnaCapoProgettoDAO assegnaCapoProgettoDAO = new AssegnaCapoProgettoDAO();
+            assegnaCapoProgettoDAO.assegnaCapoProgetto(idProgetto,cfCapo);
+        } catch (SQLException e){
+            Printer.errorMessage("Errore durante l'assegnamento del capo progetto");
+        }
+
+        Printer.println("\nIl capo progetto: " + capoProgetto.getNome() + " " + capoProgetto.getCognome() +
+                " è stato assegnato al progetto di ID: " + idProgetto + ".");
+
 
     }
+
+
+
+/*------------ Metodo per stampare la lista di progetto senza capo  */
+    public List<Progetto> stampaLista(){
+
+        //deve stampare una lista di progetto
+        //deve recuperare la lista da DB per poter visualizzare
+
+        AssegnaCapoProgettoDAO assegnaCapoProgettoDAO = new AssegnaCapoProgettoDAO();
+        List<Progetto> progettiSenzaCapo;
+        try {
+            progettiSenzaCapo = assegnaCapoProgettoDAO.listaProgettiSenzaCapo();
+
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return progettiSenzaCapo;
+
+    }
+
+
+
+/*------------ Metodo per stampare la lista di progetti con i relativi capi progetto */
+    public void stampaListaConCapo(){
+
+
+
+    }
+
+
+
+/*------------ Metodo per stampare la lista di candidati per poter essere capi progetti */
+    public List<CapoProgetto> stampaCandidatiCapo(){
+        AssegnaCapoProgettoDAO assegnaCapoProgettoDAO = new AssegnaCapoProgettoDAO();
+        List<CapoProgetto> listaCandidati;
+
+        try{
+            listaCandidati = assegnaCapoProgettoDAO.listaCandidatiCapo();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return listaCandidati;
+    }
+
+
+
+
+
 
 
 

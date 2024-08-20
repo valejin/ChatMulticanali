@@ -1,6 +1,7 @@
 package it.uniroma2.dicii.bd.controller;
 
 import it.uniroma2.dicii.bd.model.domain.Credentials;
+import it.uniroma2.dicii.bd.utils.UserSession;
 
 public class ApplicationController implements Controller{
 
@@ -11,22 +12,27 @@ public class ApplicationController implements Controller{
     public void start() {
         LoginController loginController = new LoginController();
         loginController.start();
-        cred = loginController.getCred();  //ottiene i credenziali dell'utente accesso (CF, password, ruolo)
 
+        // Ottieni l'istanza di UserSession per accedere alle credenziali dell'utente
+        UserSession session = UserSession.getInstance();
 
-        if(cred.getRole() == null) {
+        // Verifica che l'utente sia loggato e abbia un ruolo valido
+        if (!session.isLoggedIn() || session.getRole() == null) {
             throw new RuntimeException("Invalid credentials");
         }
 
 
-        switch(cred.getRole()) {
+
+
+        // Switch sul ruolo per avviare il controller appropriato
+        switch(session.getRole()) {
             //in base al ruolo, accedo al controller diverso
 
             case AMMINISTRATORE -> new AmministratoreController().start();
             case CAPOPROGETTO -> new CapoprogettoController().start();
             case DIPENDENTE -> new DipendenteController().start();
 
-            default -> throw new RuntimeException("Invalid credentials");
+            default -> throw new RuntimeException("Invalid role");
         }
     }
 }
