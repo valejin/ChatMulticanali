@@ -15,14 +15,24 @@ import java.util.Scanner;
 
 public class AmministratoreView {
 
-    public static int stampaMenu() throws IOException {
+    public static void stampaTitolo(){
         Printer.println("\n************************************");
         Printer.printlnBlu("*    Benvenuto a ChatMulticanale   *");
         Printer.println("************************************\n");
-        Printer.printlnBlu("------- OPERAZIONI PRINCIPALI ------\n");
+    }
+
+
+
+
+    public static int stampaMenu() throws IOException {
+        //Printer.println("\n************************************");
+        //Printer.printlnBlu("*    Benvenuto a ChatMulticanale   *");
+        //Printer.println("************************************\n");
+        Printer.printlnBlu("------- SCEGLI TRA OPERAZIONI ------\n");
         Printer.println("1) Inserisci progetto");
         Printer.println("2) Assegna capo progetto");
-        Printer.println("3) Stampa lista: progetti - capo progetto");
+        Printer.println("3) Visualizza lista progetti con capo progetto");
+        Printer.println("4) Visualizza lista progetti senza capo progetto");
         Printer.println("0) Quit");
 
 
@@ -32,7 +42,7 @@ public class AmministratoreView {
             try {
                 Printer.print("Please enter your choice: ");
                 choice = input.nextInt();
-                if (choice >= 0 && choice <= 3) {
+                if (choice >= 0 && choice <= 4) {
                     break;
                 }
                 Printer.println("Invalid option, please choose between 0 and 3.");
@@ -135,7 +145,6 @@ public class AmministratoreView {
 
         AmministratoreController amministratoreController = new AmministratoreController();
 
-        //dovrebbe chiamare assegnaCapo
         progettiSenzaCapo = amministratoreController.stampaLista();
 
         // Itera e stampa dei dettagli dei progetti senza capo
@@ -196,6 +205,49 @@ public class AmministratoreView {
 
         // Restituisci l'ID del progetto scelto e il CF del capo progetto
         return new Object[] { idProgettoScelto, capoProgettoScelto };
+    }
+
+
+
+    public void listaConCapo(){
+
+        Printer.printlnBlu("\n***** VISUALIZZA LISTA PROGETTO - CAPO PROGETTO *****\n");
+        Printer.println("Lista di progetti con capo progetto assegnato: ");
+
+        AmministratoreController amministratoreController = new AmministratoreController();
+        List<Progetto> listProgetti = amministratoreController.ListaConCapo();
+
+        // Itera e stampa dei dettagli dei progetti con capo
+        for (Progetto progetto : listProgetti) {
+            Printer.println("ID Progetto: " + progetto.getId());
+            Printer.println("Nome Progetto: " + progetto.getNome());
+            Printer.println("Data Inizio: " + progetto.getDataInzio());
+            Printer.println("Data Scadenza: " + progetto.getDataScadenza());
+            Printer.println("Capo progetto: " + progetto.getCapoProgetto());
+            Printer.println("-------------------------------");
+        }
+
+
+    }
+
+
+    public void listaSenzaCapo(){
+        Printer.printlnBlu("\n***** VISUALIZZA LISTA PROGETTO SENZA CAPO PROGETTO *****\n");
+        Printer.println("Lista di progetti senza capo progetto assegnato: ");
+
+        AmministratoreController amministratoreController = new AmministratoreController();
+        List<Progetto> listProgetti = amministratoreController.stampaLista();
+
+        // Itera e stampa dei dettagli dei progetti senza capo
+        for (Progetto progetto : listProgetti) {
+            Printer.println("ID Progetto: " + progetto.getId());
+            Printer.println("Nome Progetto: " + progetto.getNome());
+            Printer.println("Data Inizio: " + progetto.getDataInzio());
+            Printer.println("Data Scadenza: " + progetto.getDataScadenza());
+            Printer.println("Capo progetto: " + progetto.getCapoProgetto());
+            Printer.println("-------------------------------");
+        }
+
 
     }
 

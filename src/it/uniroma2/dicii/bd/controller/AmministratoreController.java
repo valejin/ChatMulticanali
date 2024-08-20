@@ -6,6 +6,7 @@ import it.uniroma2.dicii.bd.model.Progetto;
 import it.uniroma2.dicii.bd.model.dao.ConnectionFactory;
 import it.uniroma2.dicii.bd.model.dao.amministratore.AssegnaCapoProgettoDAO;
 import it.uniroma2.dicii.bd.model.dao.amministratore.InserisciProgettoDAO;
+import it.uniroma2.dicii.bd.model.dao.amministratore.PrintListProgettoCapoDAO;
 import it.uniroma2.dicii.bd.model.domain.Role;
 import it.uniroma2.dicii.bd.utils.Printer;
 import it.uniroma2.dicii.bd.view.AmministratoreView;
@@ -25,6 +26,8 @@ public class AmministratoreController implements Controller {
             throw new RuntimeException(e);
         }
 
+        AmministratoreView.stampaTitolo();
+
         while(true) {
             int choice;
             try {
@@ -42,8 +45,8 @@ public class AmministratoreController implements Controller {
                         throw new RuntimeException(e);
                     }
                 }
-                //case 3 -> stampaLista();    //progetti senza capo
-                //case 4 -> stampaListaConCapo();
+                case 3 -> stampaListaConCapo();
+                case 4 -> stampaListaSenzaCapo();        //progetti senza capo
                 case 0 -> System.exit(0);
                 default -> throw new RuntimeException("Invalid choice");
             }
@@ -122,7 +125,6 @@ public class AmministratoreController implements Controller {
         try {
             progettiSenzaCapo = assegnaCapoProgettoDAO.listaProgettiSenzaCapo();
 
-
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -131,14 +133,6 @@ public class AmministratoreController implements Controller {
 
     }
 
-
-
-/*------------ Metodo per stampare la lista di progetti con i relativi capi progetto */
-    public void stampaListaConCapo(){
-
-
-
-    }
 
 
 
@@ -158,6 +152,31 @@ public class AmministratoreController implements Controller {
     }
 
 
+
+/*------------ Metodo per restituire la lista di progetti con i relativi capi progetto */
+    public List<Progetto> ListaConCapo(){
+        List<Progetto> progettiConCapo;
+
+        progettiConCapo = PrintListProgettoCapoDAO.listaProgettiConCapo();
+
+        return progettiConCapo;
+    }
+
+
+/*------------ Metodo per stampare la lista di progetti con i relativi capi progetto */
+    public void stampaListaConCapo(){
+        AmministratoreView amministratoreView = new AmministratoreView();
+        amministratoreView.listaConCapo();
+
+    }
+
+
+
+/*------------ Metodo per stampare la lista di progetti senza capo progetto */
+    public void stampaListaSenzaCapo(){
+        AmministratoreView amministratoreView = new AmministratoreView();
+        amministratoreView.listaSenzaCapo();
+    }
 
 
 
