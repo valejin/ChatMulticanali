@@ -25,9 +25,7 @@ public class AmministratoreView {
 
 
     public static int stampaMenu() throws IOException {
-        //Printer.println("\n************************************");
-        //Printer.printlnBlu("*    Benvenuto a ChatMulticanale   *");
-        //Printer.println("************************************\n");
+
         Printer.printlnBlu("------- SCEGLI TRA OPERAZIONI ------\n");
         Printer.println("1) Inserisci progetto");
         Printer.println("2) Assegna capo progetto");
@@ -175,7 +173,7 @@ public class AmministratoreView {
         }
 
 
-        // Chiedi all'utente di scegliere il capo progetto (logica da implementare)
+        // Chiedi all'utente di scegliere il capo progetto
         Printer.println("\nLista dei lavoratori candidati: ");
         List<CapoProgetto> listaCandidati = amministratoreController.stampaCandidatiCapo();
 

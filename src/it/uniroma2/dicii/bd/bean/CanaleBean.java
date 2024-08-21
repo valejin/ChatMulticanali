@@ -1,13 +1,49 @@
 package it.uniroma2.dicii.bd.bean;
 
+import java.sql.Date;
+
 public class CanaleBean {
 
     private int idCanale;
     private int idProgetto;
     private String nome;
-    private String creatore;
-    private String tipo;  //public o private
+    private Date data;
+    private String cfCreatore;
+    private Tipo tipo;
 
+
+    public enum Tipo {
+        PUBLIC(1),
+        PRIVATE(2);
+
+        private final int id;
+
+        Tipo(int id) {
+            this.id = id;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public static Tipo fromId(int id) {
+            for (Tipo tipo : Tipo.values()) {
+                if (tipo.getId() == id) {
+                    return tipo;
+                }
+            }
+            throw new IllegalArgumentException("ID non valido: " + id);
+        }
+    }
+
+
+    public Date getData() {
+        return data;
+    }
+
+    public void setData(Date data) {
+        this.data = data;
+    }
 
     public int getIdCanale() {
         return idCanale;
@@ -33,19 +69,31 @@ public class CanaleBean {
         this.nome = nome;
     }
 
-    public String getCreatore() {
-        return creatore;
+    public String getCfCreatore() {
+        return cfCreatore;
     }
 
-    public void setCreatore(String creatore) {
-        this.creatore = creatore;
+    public void setCfCreatore(String cfCreatore) {
+        this.cfCreatore = cfCreatore;
     }
 
-    public String getTipo() {
+
+    // Gestione del campo `tipo` come enum
+    public Tipo getTipo() {
         return tipo;
     }
 
-    public void setTipo(String tipo) {
+    public void setTipo(Tipo tipo) {
         this.tipo = tipo;
     }
+
+    public void setTipoById(int id) {
+        this.tipo = Tipo.fromId(id);
+    }
+
+    public int getTipoId() {
+        return tipo.getId();
+    }
+
+
 }
