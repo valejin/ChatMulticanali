@@ -1,9 +1,11 @@
 package it.uniroma2.dicii.bd.controller;
 
 import it.uniroma2.dicii.bd.bean.CanaleBean;
+import it.uniroma2.dicii.bd.model.Canale;
 import it.uniroma2.dicii.bd.model.Progetto;
 import it.uniroma2.dicii.bd.model.dao.ConnectionFactory;
 import it.uniroma2.dicii.bd.model.dao.capoprogetto.CreaCanaleDAO;
+import it.uniroma2.dicii.bd.model.dao.capoprogetto.InserisciMessaggioDAO;
 import it.uniroma2.dicii.bd.model.domain.Role;
 import it.uniroma2.dicii.bd.utils.Printer;
 import it.uniroma2.dicii.bd.view.CapoprogettoView;
@@ -36,7 +38,7 @@ public class CapoprogettoController implements Controller{
 
             switch(choice) {
                 case 1 -> creaCanale();
-                //case 2 -> assegnaCapoprogetto();
+                case 2 -> inserisciNuovoMessaggio();
                 //case 3 -> stampaLista();
                 case 0 -> System.exit(0);
                 default -> throw new RuntimeException("Invalid choice");
@@ -66,14 +68,12 @@ public class CapoprogettoController implements Controller{
         }
 
 
-
-
     }
 
 
 
 
-    /* Metodo per recuperare lista di progetti con cf di capoprogetto dato da DB */
+    /* Metodo per recuperare lista di progetti con cf di capoprogetto dato da DB, chiamato da VIEW */
     public static List<Progetto> recuperoProgetti(){
 
         CreaCanaleDAO creaCanaleDAO = new CreaCanaleDAO();
@@ -87,9 +87,47 @@ public class CapoprogettoController implements Controller{
             RuntimeException exception;
         }
 
-
         return progettiTarget;
     }
+
+
+
+
+    /* Metodo per inserire un nuovo messaggio, chiamato da switch case 2 */
+    public void inserisciNuovoMessaggio(){
+
+        // Chiamo View per stampare modulo, e prendere le informazioni
+        // Poi inserisco le informazioni in DB tramite DAO
+
+        Object[] datiMessaggio = CapoprogettoView.inserisciMessaggio();
+
+        // Estraggo le informazioni dall'array di oggetti
+        String contenutoMessaggio = (String) datiMessaggio[0];
+        int idCanaleScelto = (int) datiMessaggio[1];
+        int idProgettoScelto = (int) datiMessaggio[2];
+
+        // Ora utilizzo queste informazioni per inserire il messaggio nel database
+        InserisciMessaggioDAO.inserisciMessaggio(contenutoMessaggio, idCanaleScelto, idProgettoScelto);
+
+        Printer.println("\nMessaggio inserito con successo!");
+
+
+    }
+
+
+
+    /* Metodo per recuperare la lista di canali con id progetto fornito, chiamato da VIEW */
+    public List<Canale> recuperoCanali(int idProgetto){
+
+        List<Canale> canaliTarget = null;
+
+        canaliTarget = InserisciMessaggioDAO.recuperaCanaliByIdProgetto(idProgetto);
+
+        return canaliTarget;
+
+    }
+
+
 
 
 
