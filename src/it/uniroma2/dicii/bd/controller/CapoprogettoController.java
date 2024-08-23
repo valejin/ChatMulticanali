@@ -1,11 +1,14 @@
 package it.uniroma2.dicii.bd.controller;
 
 import it.uniroma2.dicii.bd.bean.CanaleBean;
+import it.uniroma2.dicii.bd.exception.DAOException;
 import it.uniroma2.dicii.bd.model.Canale;
+import it.uniroma2.dicii.bd.model.Messaggio;
 import it.uniroma2.dicii.bd.model.Progetto;
 import it.uniroma2.dicii.bd.model.dao.ConnectionFactory;
 import it.uniroma2.dicii.bd.model.dao.capoprogetto.CreaCanaleDAO;
 import it.uniroma2.dicii.bd.model.dao.capoprogetto.InserisciMessaggioDAO;
+import it.uniroma2.dicii.bd.model.dao.capoprogetto.VisualizzaConversazioneDAO;
 import it.uniroma2.dicii.bd.model.domain.Role;
 import it.uniroma2.dicii.bd.utils.Printer;
 import it.uniroma2.dicii.bd.view.CapoprogettoView;
@@ -39,7 +42,7 @@ public class CapoprogettoController implements Controller{
             switch(choice) {
                 case 1 -> creaCanale();
                 case 2 -> inserisciNuovoMessaggio();
-                //case 3 -> stampaLista();
+                case 3 -> visualizzaConversazione();
                 case 0 -> System.exit(0);
                 default -> throw new RuntimeException("Invalid choice");
             }
@@ -110,8 +113,6 @@ public class CapoprogettoController implements Controller{
         InserisciMessaggioDAO.inserisciMessaggio(contenutoMessaggio, idCanaleScelto, idProgettoScelto);
 
         Printer.println("\nMessaggio inserito con successo!");
-
-
     }
 
 
@@ -124,8 +125,41 @@ public class CapoprogettoController implements Controller{
         canaliTarget = InserisciMessaggioDAO.recuperaCanaliByIdProgetto(idProgetto);
 
         return canaliTarget;
+    }
+
+
+
+
+    /* Metodo per visualizzare le conversazioni in un canale scelto da utente, chiamato da switch case 3 */
+    public void visualizzaConversazione(){
+
+        // Chiamo VIEW per chiedere all'utente quale conversazione desidera di vedere
+        CapoprogettoView capoprogettoView = new CapoprogettoView();
+        Object[] infoCanale = capoprogettoView.visualizzaConversazione();
+        List<Messaggio> conversazioni = null;
+
+        // Viene restituito ID progetto e ID canale
+        int idCanaleScelto = (int) infoCanale[0];
+        int idProgettoScelto = (int) infoCanale[1];
+
+
+        // Chiamo DAO per recuperare i messaggi del canale scelto, poi li restituisco a VIEW per stampare all'utente
+        VisualizzaConversazioneDAO visualizzaConversazioneDAO = new VisualizzaConversazioneDAO();
+        try {
+            conversazioni = visualizzaConversazioneDAO.recuperoConversazione(idCanaleScelto, idProgettoScelto);
+        } catch(DAOException e){
+            Printer.errorMessage("Errore Visualizzazione Conversazione Controller");
+        }
+        // RICORDA: i messaggi vengono stampati come le pagine
+
+
+        capoprogettoView.stampaConversazione(conversazioni);
+
 
     }
+
+
+
 
 
 

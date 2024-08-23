@@ -1,5 +1,6 @@
 package it.uniroma2.dicii.bd.model.dao.capoprogetto;
 
+import it.uniroma2.dicii.bd.exception.DAOException;
 import it.uniroma2.dicii.bd.model.dao.ConnectionFactory;
 import it.uniroma2.dicii.bd.model.Canale;
 import it.uniroma2.dicii.bd.utils.Printer;
@@ -18,8 +19,8 @@ public class InserisciMessaggioDAO {
     /* Metodo per inserire un nuovo messaggio in un canale */
     public static void inserisciMessaggio(String contenutoMessaggio, int idCanale, int idProgetto){
 
-        Connection conn = null;
-        CallableStatement cs = null;
+        Connection conn;
+        CallableStatement cs;
         UserSession userSession = UserSession.getInstance();
 
         try{
@@ -41,13 +42,10 @@ public class InserisciMessaggioDAO {
             // Esegui la stored procedure
             cs.execute();
 
-
         } catch(SQLException e){
             Printer.errorMessage("Errore all'inserimento messaggio DAO");
             e.printStackTrace();
         }
-
-
 
     }
 
@@ -57,9 +55,9 @@ public class InserisciMessaggioDAO {
     public static List<Canale> recuperaCanaliByIdProgetto(int idProgetto){
 
         List<Canale> canaleList = new ArrayList<>();
-        Connection conn = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
+        Connection conn;
+        CallableStatement cs;
+        ResultSet rs;
 
         try {
             conn = ConnectionFactory.getConnection();
@@ -86,8 +84,8 @@ public class InserisciMessaggioDAO {
                     canale.setIdCanale(rs.getInt("IDCanale"));
                     canale.setNome(rs.getString("Nome"));
                     canale.setCfCreatore(rs.getString("Creatore"));
-                    //canale.setTipoById(rs.getInt("Tipo"));
                     canale.setData(rs.getDate("DataCreazione"));
+
                     // Recupera il valore ENUM dal database come stringa
                     String tipoString = rs.getString("Tipo");
                     Canale.Tipo tipo = Canale.Tipo.valueOf(tipoString.toUpperCase()); // Conversione da stringa a ENUM
@@ -97,14 +95,12 @@ public class InserisciMessaggioDAO {
                 }
             }
 
-
         } catch(SQLException e){
             Printer.errorMessage("Errore nell'recupera canali by Id progetto");
             e.printStackTrace();
         }
 
         return canaleList;
-
     }
 
 
