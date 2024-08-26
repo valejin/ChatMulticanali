@@ -6,6 +6,24 @@ public class UserBean {
     private String CF;
     private Role ruolo;
     private String username;
+    private String nome;
+    private String cognome;
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public String getCognome() {
+        return cognome;
+    }
+
+    public void setCognome(String cognome) {
+        this.cognome = cognome;
+    }
 
     public String getCF() {
         return CF;
@@ -29,5 +47,14 @@ public class UserBean {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    // Nuovo metodo per ottenere l'ID del ruolo
+    public int getRuoloId() {
+        if (ruolo != null) {
+            return ruolo.getId();
+        } else {
+            throw new IllegalStateException("Il ruolo non è stato assegnato.");
+        }
     }
 }

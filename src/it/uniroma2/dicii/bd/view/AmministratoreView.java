@@ -1,9 +1,11 @@
 package it.uniroma2.dicii.bd.view;
 
 import it.uniroma2.dicii.bd.bean.ProgettoBean;
+import it.uniroma2.dicii.bd.bean.UserBean;
 import it.uniroma2.dicii.bd.controller.AmministratoreController;
 import it.uniroma2.dicii.bd.model.CapoProgetto;
 import it.uniroma2.dicii.bd.model.Progetto;
+import it.uniroma2.dicii.bd.model.domain.Role;
 import it.uniroma2.dicii.bd.utils.Printer;
 
 
@@ -18,7 +20,7 @@ public class AmministratoreView {
     public static void stampaTitolo(){
         Printer.println("\n************************************");
         Printer.printlnBlu("*    Benvenuto a ChatMulticanale   *");
-        Printer.println("************************************\n");
+        Printer.println("************************************");
     }
 
 
@@ -26,11 +28,12 @@ public class AmministratoreView {
 
     public static int stampaMenu() throws IOException {
 
-        Printer.printlnBlu("------- SCEGLI TRA OPERAZIONI ------\n");
+        Printer.printlnBlu("\n------- SCEGLI TRA OPERAZIONI ------");
         Printer.println("1) Inserisci progetto");
         Printer.println("2) Assegna capo progetto");
         Printer.println("3) Visualizza lista progetti con capo progetto");
         Printer.println("4) Visualizza lista progetti senza capo progetto");
+        Printer.println("5) Inserisci nuovo lavoratore");
         Printer.println("0) Quit");
 
 
@@ -40,10 +43,10 @@ public class AmministratoreView {
             try {
                 Printer.print("Please enter your choice: ");
                 choice = input.nextInt();
-                if (choice >= 0 && choice <= 4) {
+                if (choice >= 0 && choice <= 5) {
                     break;
                 }
-                Printer.println("Invalid option, please choose between 0 and 3.");
+                Printer.println("Invalid option, please choose between 0 and 5.");
             } catch (InputMismatchException e) {
                 Printer.println("Invalid input. Please enter a number between 0 and 3.");
                 input.next(); // Consuma l'input non valido
@@ -246,8 +249,71 @@ public class AmministratoreView {
             Printer.println("-------------------------------");
         }
 
+    }
+
+
+    /* Metodo per inserire lavoratore, chiamato da Controller per recuperare input da utente */
+    public UserBean nuovoUtente(){
+        Printer.printlnBlu("\n***** INSERISCI NUOVO UTENTE IN SISTEMA *****\n");
+        Scanner input = new Scanner(System.in);
+        Printer.println("Compila il seguente modulo: ");
+
+        //INFO: cf, nome, cognome, ruolo
+        Printer.print("CF lavoratore: ");
+        String cfUtente = input.nextLine();
+
+        Printer.print("Nome: ");
+        String nome = input.nextLine();
+
+        Printer.print("Cognome: ");
+        String cognome = input.nextLine();
+
+
+        // Variabile per il ruolo
+        Role ruolo = null;
+
+        // Ciclo per richiedere un ruolo valido
+        while (ruolo == null) {
+            // Mostra i ruoli disponibili
+            Printer.println("\nSeleziona il ruolo:");
+            for (Role role : Role.values()) {
+                Printer.println(role.getId() + " - " + role.name());
+            }
+
+            // Chiede all'utente di selezionare un ruolo
+            Printer.print("Inserisci il numero del ruolo (1-3): ");
+            while (!input.hasNextInt()) {
+                Printer.println("Errore: Inserisci un numero valido.");
+                input.next(); // Consuma l'input non valido
+                Printer.print("Inserisci il numero del ruolo (1-3): ");
+            }
+            int ruoloId = input.nextInt();
+            input.nextLine();
+
+            // Verifica che il numero sia compreso tra 1 e 3
+            if (ruoloId < 1 || ruoloId > 3) {
+                Printer.println("Errore: Il numero deve essere compreso tra 1 e 3. Per favore, riprova.");
+                continue; // Torna all'inizio del ciclo
+            }
+
+            // Ottiene il ruolo corrispondente
+            ruolo = Role.fromInt(ruoloId);
+            if (ruolo == null) {
+                Printer.println("Ruolo non valido. Per favore, riprova.");
+            }
+        }
+
+
+        UserBean userBean = new UserBean();
+        userBean.setCF(cfUtente);
+        userBean.setNome(nome);
+        userBean.setCognome(cognome);
+        userBean.setRuolo(ruolo);
+
+        return userBean;
 
     }
+
 
 
 

@@ -1,10 +1,12 @@
 package it.uniroma2.dicii.bd.controller;
 
 import it.uniroma2.dicii.bd.bean.ProgettoBean;
+import it.uniroma2.dicii.bd.bean.UserBean;
 import it.uniroma2.dicii.bd.model.CapoProgetto;
 import it.uniroma2.dicii.bd.model.Progetto;
 import it.uniroma2.dicii.bd.model.dao.ConnectionFactory;
 import it.uniroma2.dicii.bd.model.dao.amministratore.AssegnaCapoProgettoDAO;
+import it.uniroma2.dicii.bd.model.dao.amministratore.InserisciLavoratoreDAO;
 import it.uniroma2.dicii.bd.model.dao.amministratore.InserisciProgettoDAO;
 import it.uniroma2.dicii.bd.model.dao.amministratore.PrintListProgettoCapoDAO;
 import it.uniroma2.dicii.bd.model.domain.Role;
@@ -47,6 +49,7 @@ public class AmministratoreController implements Controller {
                 }
                 case 3 -> stampaListaConCapo();
                 case 4 -> stampaListaSenzaCapo();        //progetti senza capo
+                case 5 -> inserisciLavoratore();
                 case 0 -> System.exit(0);
                 default -> throw new RuntimeException("Invalid choice");
             }
@@ -180,8 +183,19 @@ public class AmministratoreController implements Controller {
 
 
 
+/* Metodo per inserire lavoratore, chiamato da switch case 5 */
+    public void inserisciLavoratore(){
 
+        AmministratoreView amministratoreView = new AmministratoreView();
+        UserBean userBean = amministratoreView.nuovoUtente();
 
+        // Il valore di ritorno verrà salvato in DB: tabella lavoratore
+        InserisciLavoratoreDAO inserisciLavoratoreDAO = new InserisciLavoratoreDAO();
+        inserisciLavoratoreDAO.inserisciLavoratore(userBean);
+
+        Printer.printlnViola("Lavoratore inserito con successo!");
+
+    }
 
 
 }

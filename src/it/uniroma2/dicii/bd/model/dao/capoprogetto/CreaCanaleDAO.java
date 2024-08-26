@@ -65,18 +65,17 @@ public class CreaCanaleDAO {
         Connection conn = ConnectionFactory.getConnection();
         UserSession userSession = UserSession.getInstance();
 
-        //recupera lista di progetti con cf del capoprogetto
-        CallableStatement cs = conn.prepareCall("{call inserisci_nuovo_canale(?,?,?,?,?,?)}");
+        CallableStatement cs = conn.prepareCall("{call inserisci_nuovo_canale(?,?,?,?,?)}");
 
-        cs.setInt(1, canaleBean.getIdCanale());
-        cs.setInt(2, canaleBean.getIdProgetto());
-        cs.setString(3, canaleBean.getNome());
-        cs.setString(4, userSession.getCf());
-        cs.setInt(5, canaleBean.getTipoId());
-        cs.setDate(6,canaleBean.getData());
+        cs.setInt(1, canaleBean.getIdProgetto());
+        cs.setString(2, canaleBean.getNome());
+        cs.setString(3, userSession.getCf());
+        cs.setInt(4, canaleBean.getTipoId());
+        cs.setDate(5,canaleBean.getData());
 
         // Esegui la stored procedure
         cs.execute();
+
 
 
     }

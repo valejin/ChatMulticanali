@@ -87,9 +87,8 @@ public class CapoprogettoController implements Controller{
             progettiTarget = creaCanaleDAO.recuperoProgettiByCf();
 
         } catch(SQLException e){
-            RuntimeException exception;
+            Printer.errorMessage("Errore recuperoProgetti in Controller");
         }
-
         return progettiTarget;
     }
 
@@ -135,12 +134,13 @@ public class CapoprogettoController implements Controller{
 
         // Chiamo VIEW per chiedere all'utente quale conversazione desidera di vedere
         CapoprogettoView capoprogettoView = new CapoprogettoView();
-        Object[] infoCanale = capoprogettoView.visualizzaConversazione();
+        Object[] infoCanale = capoprogettoView.visualizzaCanaliAppartenenti();
         List<Messaggio> conversazioni = null;
 
         // Viene restituito ID progetto e ID canale
         int idCanaleScelto = (int) infoCanale[0];
         int idProgettoScelto = (int) infoCanale[1];
+        int tipoCanaleScelto = (int) infoCanale[2];
 
 
         // Chiamo DAO per recuperare i messaggi del canale scelto, poi li restituisco a VIEW per stampare all'utente
@@ -152,8 +152,54 @@ public class CapoprogettoController implements Controller{
         }
         // RICORDA: i messaggi vengono stampati come le pagine
 
+        capoprogettoView.stampaConversazione(conversazioni, idCanaleScelto, idProgettoScelto, tipoCanaleScelto);
 
-        capoprogettoView.stampaConversazione(conversazioni);
+    }
+
+
+    /* Metodo per salvare la risposta di utente (in modo pubblico) in DB, chiamato da VIEW */
+    public void rispostaPublic(Messaggio messaggioOriginale, String contenutoRisposta){
+
+        try {
+            // Nel messaggio originario contiene già idCanale e idProgetto
+            // Il messaggio in DB viene identificato da CFMittente, DataInvio e OrarioInvio
+            VisualizzaConversazioneDAO.inserisciRisposta(messaggioOriginale, contenutoRisposta, 0);
+            Printer.println("Risposta pubblica inviata con successo.");
+
+
+        } catch (DAOException e) {
+            Printer.errorMessage("Errore durante l'invio della risposta pubblica.");
+        }
+
+    }
+
+
+
+    /* Metodo per creare un canale di comunicazione privata, chiamata da VIEW */
+    public void creaCanalePrivata(CanaleBean canalePrivata){
+
+        CreaCanaleDAO creaCanaleDAO = new CreaCanaleDAO();
+
+        try {
+            creaCanaleDAO.inserireNuovoCanale(canalePrivata);
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+
+    }
+
+
+
+    /* Metodo per memorizzare la risposta privata in DB */
+    public void memorizzaRispostaPrivata(Messaggio messaggioOriginale, String contenutoRisposta){
+
+        try {
+            VisualizzaConversazioneDAO visualizzaConversazioneDAO = new VisualizzaConversazioneDAO();
+            visualizzaConversazioneDAO.inserisciRispostaPrivata(messaggioOriginale, contenutoRisposta);
+        } catch(DAOException e){
+            Printer.errorMessage("Errore inserimento risposta privata in DB con nuovo metodo");
+            e.printStackTrace();
+        }
 
 
     }
@@ -161,6 +207,31 @@ public class CapoprogettoController implements Controller{
 
 
 
+
+
+
+
+
+
+
+
+
+
+    /* Metodo per salvare la risposta privata di utente in DB, chiamato da VIEW */
+    public void rispostaPrivate(Messaggio messaggioOriginale, String contenutoRisposta){
+
+        try {
+            // Nel messaggio originario contiene già idCanale e idProgetto
+            // Il messaggio in DB viene identificato da CFrispondente, DataInvio e OrarioInvio
+            VisualizzaConversazioneDAO.inserisciRisposta(messaggioOriginale, contenutoRisposta, 1);
+            Printer.println("Risposta privata inviata con successo.");
+
+
+        } catch (DAOException e) {
+            Printer.errorMessage("Errore durante l'invio della risposta privata.");
+        }
+
+    }
 
 
 

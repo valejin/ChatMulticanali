@@ -3,11 +3,12 @@ package it.uniroma2.dicii.bd.model.dao.capoprogetto;
 import it.uniroma2.dicii.bd.exception.DAOException;
 import it.uniroma2.dicii.bd.model.Messaggio;
 import it.uniroma2.dicii.bd.model.dao.ConnectionFactory;
+import it.uniroma2.dicii.bd.utils.UserSession;
 
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,14 +42,29 @@ public class VisualizzaConversazioneDAO {
 
                     Messaggio messaggio = new Messaggio();
 
-                    messaggio.setNomeUtente(rs.getString("Nome"));
-                    messaggio.setCognomeUtente(rs.getString("Cognome"));
-                    messaggio.setDataInvio(rs.getDate("DataInvio"));
-                    messaggio.setOrarioInvio(rs.getTime("OrarioInvio"));
-                    messaggio.setContenuto(rs.getString("Contenuto"));
+                    messaggio.setCfUtente(rs.getString("m.CF"));
+                    messaggio.setNomeUtente(rs.getString("l.Nome"));
+                    messaggio.setCognomeUtente(rs.getString("l.Cognome"));
+                    messaggio.setDataInvio(rs.getDate("m.DataInvio"));
+                    messaggio.setOrarioInvio(rs.getTime("m.OrarioInvio"));
+                    messaggio.setContenuto(rs.getString("m.Contenuto"));
+                    messaggio.setIsVisible(rs.getInt("r.Visibilita"));
 
+                    // Controlla se il messaggio è una risposta
+                    String cfRispondente = rs.getString("r.Rispondente_CF"); // Modifica in base al nome del campo
+                    if (cfRispondente != null && !cfRispondente.isEmpty()) {
+                        messaggio.setRisposta(true);
+
+                        // Recupera il messaggio originale a cui si sta rispondendo
+                        Messaggio messaggioOriginale = new Messaggio();
+                        messaggioOriginale.setCfUtente(rs.getString("r.Mittente_CF"));
+                        messaggioOriginale.setDataInvio(rs.getDate("r.DataInvioMittente"));
+                        messaggioOriginale.setOrarioInvio(rs.getTime("r.OrarioInvioMittente"));
+
+                        messaggio.setMessaggioOriginale(messaggioOriginale);
+
+                    }
                     conversazioni.add(messaggio);
-
                 }
             }
 
@@ -59,6 +75,132 @@ public class VisualizzaConversazioneDAO {
         }
         return conversazioni;
     }
+
+
+
+    /* Metodo per memorizzare i dati della risposta di utente relativa a un messaggio in tabella risposta
+    * e salvare la risposta come un messaggio */
+    public static void inserisciRisposta(Messaggio messaggioOriginale, String contenutoRisposta, int visible) throws DAOException{
+
+        Connection conn;
+        CallableStatement cs;
+
+        // Ottengo data e ora attuale
+        LocalDate currentDate = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
+        LocalTime truncatedTime = currentTime.truncatedTo(ChronoUnit.SECONDS);
+
+
+        // Per inserire il messaggio risposta in tabella Messaggio insieme con il contenuto
+        try{
+            conn = ConnectionFactory.getConnection();
+            UserSession session = UserSession.getInstance();
+
+            // Prepara la chiamata alla stored procedure
+            cs = conn.prepareCall("{call inserisci_messaggio(?,?,?,?,?,?)}");
+
+            cs.setString(1, session.getCf());
+            cs.setDate(2, Date.valueOf(currentDate));
+            cs.setTime(3, Time.valueOf(truncatedTime));
+            cs.setString(4, contenutoRisposta);
+            cs.setInt(5, messaggioOriginale.getIdCanale());
+            cs.setInt(6, messaggioOriginale.getIdProgetto());
+
+            // Esegui la stored procedure
+            cs.execute();
+
+        } catch(SQLException s){
+            s.printStackTrace();
+            throw new DAOException("Errore l'inserimento messaggio risposta in DAO nella tabella Messaggio");
+
+        }
+
+
+
+        try {
+            conn = ConnectionFactory.getConnection();
+            UserSession session = UserSession.getInstance();
+
+
+            // Prepara la chiamata alla stored procedure
+            cs = conn.prepareCall("{call inserisci_risposta(?,?,?,?,?,?,?)}");
+
+            // Mettere: CFMittente, DataInvio, OrarioInvio, visibilità, CFRispondente, DataInvioRispondente, OrarioInvioRispondente
+            cs.setString(1, messaggioOriginale.getCfUtente());
+            cs.setDate(2, messaggioOriginale.getDataInvio());
+            cs.setTime(3, messaggioOriginale.getOrarioInvio());
+
+            if(visible == 0) {
+                cs.setInt(4, 0);  // visibilità: public=0 private=1
+            }else if (visible == 1){
+                cs.setInt(4, 1);  // visibilità: public=0 private=1
+            }
+            cs.setString(5, session.getCf());  //cf di rispondente
+            cs.setDate(6, Date.valueOf(currentDate));
+            cs.setTime(7, Time.valueOf(truncatedTime));
+
+            // Esegui la stored procedure
+            cs.execute();
+
+        } catch(SQLException e){
+            e.printStackTrace();
+            throw new DAOException("Errore l'inserimento risposta in DAO nella tabella Risposta");
+        }
+
+    }
+
+
+    /* Metodo per inserire una risposta privata in DB, creando un nuovo canale privato*/
+    public void inserisciRispostaPrivata(Messaggio messaggioOriginale, String contenutoRisposta) throws DAOException{
+
+        Connection conn;
+        CallableStatement cs;
+
+        // Ottengo data e ora attuale
+        LocalDate currentDate = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
+        LocalTime truncatedTime = currentTime.truncatedTo(ChronoUnit.SECONDS);
+
+        try{
+            conn = ConnectionFactory.getConnection();
+            UserSession session = UserSession.getInstance();
+
+            // Prepara la chiamata alla stored procedure
+            cs = conn.prepareCall("{call inserisci_risposta_privata(?,?,?,?,?,?,?,?,?)}");
+
+            //in tabella Risposta: mittenteCF, dataInvioM, orarioInvioM, visibilità, rispondenteCF, dataInvioR, orarioInvioR
+            //in messaggio: CFmittente, dataInvio, orarioInvio, contenuto, idCanale, id Progetto
+
+            // info per inserire in messaggio
+            cs.setString(1, session.getCf());  //rispondenteCF
+            cs.setDate(2, Date.valueOf(currentDate));  //dataInvioR
+            cs.setTime(3, Time.valueOf(truncatedTime));  //orarioInvioR
+            cs.setString(4, contenutoRisposta);  //contenutoRispostaPrivata
+            cs.setInt(5, messaggioOriginale.getIdCanale());  //messaggio originario id canale
+            cs.setInt(6, messaggioOriginale.getIdProgetto());  //messaggio originario id progetto
+
+            // info per inserire in risposta
+            cs.setString(7, messaggioOriginale.getCfUtente());  //CF mittente messaggio originario
+            cs.setDate(8, messaggioOriginale.getDataInvio());  //dataInvio messaggio originario
+            cs.setTime(9, messaggioOriginale.getOrarioInvio());  //orarioInvio messaggio originario
+            // visibilità verrà settato in SQL
+
+            // Esegui la stored procedure
+            cs.execute();
+
+
+        } catch(SQLException e){
+            e.printStackTrace();
+            throw new DAOException("Errore in DAO");
+        }
+
+
+    }
+
+
+
+
+
 
 
 

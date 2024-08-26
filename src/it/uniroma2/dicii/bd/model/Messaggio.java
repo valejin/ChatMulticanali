@@ -13,6 +13,33 @@ public class Messaggio {
     private int idProgetto;
     private String nomeUtente;
     private String cognomeUtente;
+    private boolean isRisposta;  // Indica se questo messaggio è una risposta
+    private Messaggio messaggioOriginale;  // Il messaggio originale a cui questo risponde
+    private Integer isVisible;  // null di default, 0 per risposta pubblica, 1 per risposta privata
+
+    public Integer getIsVisible() {
+        return isVisible;
+    }
+
+    public void setIsVisible(Integer isVisible) {
+        this.isVisible = isVisible;
+    }
+
+    public boolean isRisposta() {
+        return isRisposta;
+    }
+
+    public void setRisposta(boolean risposta) {
+        isRisposta = risposta;
+    }
+
+    public Messaggio getMessaggioOriginale() {
+        return messaggioOriginale;
+    }
+
+    public void setMessaggioOriginale(Messaggio messaggioOriginale) {
+        this.messaggioOriginale = messaggioOriginale;
+    }
 
     public String getCfUtente() {
         return cfUtente;

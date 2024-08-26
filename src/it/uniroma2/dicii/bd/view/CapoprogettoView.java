@@ -81,9 +81,9 @@ public class CapoprogettoView {
         // Chiedi all'utente di compilare le informazioni per creare un nuovo canale
         Printer.printlnBlu("\n------ COMPILA MODULO -----\n");
 
-        Printer.print("ID canale: ");
-        int idCanale = input.nextInt();
-        input.nextLine();  // Consuma la newline
+        //Printer.print("ID canale: ");
+        //int idCanale = input.nextInt();
+        //input.nextLine();  // Consuma la newline
 
         Printer.print("Nome canale: ");
         String nomeCanale = input.next();
@@ -97,7 +97,6 @@ public class CapoprogettoView {
         String cfCapo = session.getCf();
 
         // Compilo info canale
-        canaleBean.setIdCanale(idCanale);
         canaleBean.setIdProgetto(idProgettoScelto);
         canaleBean.setNome(nomeCanale);
         canaleBean.setCfCreatore(cfCapo);
@@ -175,8 +174,8 @@ public class CapoprogettoView {
 
 
 
-    /* Metodo per visualizzare i messaggi di un canale sclto da utente */
-    public Object[] visualizzaConversazione(){
+    /* Metodo per visualizzare i messaggi di un canale scelto da utente */
+    public Object[] visualizzaCanaliAppartenenti(){
 
         Scanner input = new Scanner(System.in);
 
@@ -225,34 +224,99 @@ public class CapoprogettoView {
         Printer.print("\nInserisci l'ID del canale per visualizzare la conversazione: ");
         int idCanaleScelto = input.nextInt();
         input.nextLine();  // Consuma la newline
+        int tipoCanaleScelto = 0;
 
-        return new Object[] {idCanaleScelto, idProgettoScelto};
+
+
+        // Trova il tipo di canale selezionato
+        for (Canale canale : canaleList) {
+            if (canale.getIdCanale() == idCanaleScelto) {
+                tipoCanaleScelto = canale.getTipoId();
+                break;
+            }
+        }
+
+
+        // Restituisce un array contenente l'ID del canale, l'ID del progetto e il tipo di canale
+        return new Object[] {idCanaleScelto, idProgettoScelto, tipoCanaleScelto};    //qui bisogna passare anche il tipo di canale
 
     }
 
 
 
     /* Metodo per stampare le pagine di messaggi, chiamato da controller */
-    public void stampaConversazione(List<Messaggio> conversazione){
+    public void stampaConversazione(List<Messaggio> conversazione, int idCanale, int idProgetto, int tipoCanale) {
         /* I messaggi sono organizzati in pagine e i capi progetto e dipendenti possono visualizzare,
         una per una, le pagine della conversazione.*/
 
         Scanner scanner = new Scanner(System.in);
         int messaggiPerPagina = 5;  // Numero di messaggi per pagina
-        int numeroPagine = (int) Math.ceil((double) conversazione.size() / messaggiPerPagina);
+        List<Messaggio> messaggiDaVisualizzare = new ArrayList<>();
+        UserSession session = UserSession.getInstance();
+
+
+        // Filtra i messaggi in base al tipo di canale
+        if (tipoCanale == 1) {  // Canale pubblico
+            for (Messaggio messaggio : conversazione) {
+                if (messaggio.getIsVisible() == null || messaggio.getIsVisible() == 0) {
+                    messaggiDaVisualizzare.add(messaggio);
+                }
+            }
+        } else if (tipoCanale == 2) {  // Canale privato
+            messaggiDaVisualizzare.addAll(conversazione);
+        }
+
+
+
+
+        // Filtra i messaggi per includere solo quelli pubblici
+        /*for (Messaggio messaggio : conversazione) {
+            if (messaggio.getIsVisible() == null || messaggio.getIsVisible() == 0) {
+                messaggiDaVisualizzare.add(messaggio);
+            }
+        }
+
+         */
+
+
+        int numeroPagine = (int) Math.ceil((double) messaggiDaVisualizzare.size() / messaggiPerPagina);
         int paginaCorrente = 0;
 
         while (true) {
             // Calcola l'indice di inizio e fine per la pagina corrente
             int start = paginaCorrente * messaggiPerPagina;
-            int end = Math.min(start + messaggiPerPagina, conversazione.size());
+            int end = Math.min(start + messaggiPerPagina, messaggiDaVisualizzare.size());
 
             Printer.printlnBlu("\n***** DETTAGLI CONVERSAZIONE - PAGINA " + (paginaCorrente + 1) + " di " + numeroPagine + " *****");
 
             // Stampa i messaggi per la pagina corrente con numerazione
             for (int i = start; i < end; i++) {
-                Messaggio messaggio = conversazione.get(i);
+                Messaggio messaggio = messaggiDaVisualizzare.get(i);
                 int numeroMessaggio = i + 1;  // Numero univoco del messaggio
+
+                if (messaggio.isRisposta()) {
+                    // Cerca l'indice del messaggio originale
+                    Messaggio messaggioOriginale = messaggio.getMessaggioOriginale();
+                    int numeroMessaggioOriginale = -1;
+
+                    for (int j = 0; j < messaggiDaVisualizzare.size(); j++) {
+                        Messaggio msg = messaggiDaVisualizzare.get(j);
+                        // Confronta gli attributi unici per identificare il messaggio originale
+                        if (msg.getCfUtente().equals(messaggioOriginale.getCfUtente())
+                                && msg.getDataInvio().equals(messaggioOriginale.getDataInvio())
+                                && msg.getOrarioInvio().equals(messaggioOriginale.getOrarioInvio())) {
+                            numeroMessaggioOriginale = j + 1; // Indice del messaggio originale (inizia da 1)
+                            break;
+                        }
+                    }
+
+                    if (numeroMessaggioOriginale != -1) {
+                        Printer.printlnViola("Risposta al Messaggio #" + numeroMessaggioOriginale);
+                    } else {
+                        Printer.println("Risposta a un messaggio non trovato.");
+                    }
+                }
+
                 Printer.println("Messaggio #" + numeroMessaggio);
                 Printer.print("Nome: " + messaggio.getNomeUtente() + "   ");
                 Printer.println("Cognome: " + messaggio.getCognomeUtente());
@@ -260,6 +324,7 @@ public class CapoprogettoView {
                 Printer.println("Orario Invio: " + messaggio.getOrarioInvio());
                 Printer.println("Contenuto: " + messaggio.getContenuto());
                 Printer.println("-------------------------------");
+
             }
 
             // Chiedi all'utente cosa fare
@@ -271,9 +336,67 @@ public class CapoprogettoView {
             } else if (scelta == 2 && paginaCorrente < numeroPagine - 1) {
                 paginaCorrente++;  // Vai alla pagina successiva
             } else if (scelta == 3) {
-                Printer.print("Inserisci il numero del messaggio a cui vuoi rispondere: ");
+                Printer.print("\nInserisci il numero del messaggio a cui vuoi rispondere: ");
+
                 int numeroMessaggio = scanner.nextInt();
-                //rispondiMessaggio(conversazione, numeroMessaggio);  // Chiama il metodo per rispondere al messaggio
+                scanner.nextLine();
+                Messaggio messaggioOriginale = messaggiDaVisualizzare.get(numeroMessaggio - 1);
+                messaggioOriginale.setIdCanale(idCanale);
+                messaggioOriginale.setIdProgetto(idProgetto);
+
+                Printer.println("\nVuoi rispondere in [1] Pubblico o [2] Privato?");
+                int sceltaRisposta = scanner.nextInt();
+                scanner.nextLine();
+
+                if (sceltaRisposta == 1) {
+                    // Risposta pubblica
+                    Printer.print("Inserisci la risposta: ");
+                    String contenutoRisposta = scanner.nextLine();
+
+                    // Chiama il metodo di controller per memorizzare la risposta in DB
+                    CapoprogettoController capoprogettoController = new CapoprogettoController();
+                    capoprogettoController.rispostaPublic(messaggioOriginale, contenutoRisposta);
+
+                } else if (sceltaRisposta == 2) {
+                    // Risposta privata
+                    Printer.print("Inserisci il tuo messaggio privato: ");
+                    String contenutoRispostaPrivata = scanner.nextLine();
+
+
+                    /*
+                    // Imposto le info per creare un canale privata
+                    CanaleBean canalePrivata = new CanaleBean();
+                    canalePrivata.setIdProgetto(idProgetto);
+                    canalePrivata.setTipoById(2);  //private
+                    canalePrivata.setCfCreatore(session.getCf());  //cf utente rispondente
+
+                    // Prendo la data odierna come giorno di creazione canale
+                    LocalDate currentDate = LocalDate.now();
+                    Date giornoCreazione = Date.valueOf(currentDate);
+
+                    canalePrivata.setData(giornoCreazione);  //giorni odierno
+
+
+
+                    // Chiama il metodo di controller per creare un nuovo canale privato e memorizzare la risposta in DB
+                    CapoprogettoController capoprogettoController = new CapoprogettoController();
+                    capoprogettoController.creaCanalePrivata(canalePrivata);  //creato nuovo canale privato
+
+                    // Memorizzo la risposta privata in DB
+                    capoprogettoController.rispostaPrivate(messaggioOriginale, contenutoRispostaPrivata);
+
+
+                     */
+
+
+                    // NUOVO METODO: Chiamo controller per memorizzare il messaggio di risposta privata
+                    CapoprogettoController capoprogettoController = new CapoprogettoController();
+                    capoprogettoController.memorizzaRispostaPrivata(messaggioOriginale, contenutoRispostaPrivata);
+
+
+
+                }
+
             } else if (scelta == 0) {
                 break;  // Esci dalla visualizzazione
             } else {
@@ -281,12 +404,14 @@ public class CapoprogettoView {
             }
         }
 
-
     }
 
 
 
+    //il metodo per inserire il contenuto di messaggio risposta, posso rispondere in modo pubblico su canale
+    //o in modo privato creando un canale di comunicazione privato
 
+    /* Metodo per rispondere un messaggio scelto da utente, chiamato dal VIEW mentre stampa conversazione */
 
 
 
