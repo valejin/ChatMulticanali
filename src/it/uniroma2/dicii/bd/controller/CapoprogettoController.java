@@ -9,7 +9,7 @@ import it.uniroma2.dicii.bd.model.Progetto;
 import it.uniroma2.dicii.bd.model.dao.ConnectionFactory;
 import it.uniroma2.dicii.bd.model.dao.capoprogetto.AssegnaCanaleDAO;
 import it.uniroma2.dicii.bd.model.dao.capoprogetto.CreaCanaleDAO;
-import it.uniroma2.dicii.bd.model.dao.capoprogetto.InserisciMessaggioDAO;
+import it.uniroma2.dicii.bd.model.dao.InserisciMessaggioDAO;
 import it.uniroma2.dicii.bd.model.dao.capoprogetto.VisualizzaConversazioneDAO;
 import it.uniroma2.dicii.bd.model.domain.Role;
 import it.uniroma2.dicii.bd.utils.Printer;
@@ -115,7 +115,7 @@ public class CapoprogettoController implements Controller{
         // Ora utilizzo queste informazioni per inserire il messaggio nel database
         InserisciMessaggioDAO.inserisciMessaggio(contenutoMessaggio, idCanaleScelto, idProgettoScelto);
 
-        Printer.println("\nMessaggio inserito con successo!");
+        Printer.printlnViola("\nMessaggio inserito con successo!");
     }
 
 

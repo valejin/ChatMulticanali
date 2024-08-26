@@ -1,6 +1,7 @@
-package it.uniroma2.dicii.bd.model.dao.capoprogetto;
+package it.uniroma2.dicii.bd.model.dao;
 
 import it.uniroma2.dicii.bd.exception.DAOException;
+import it.uniroma2.dicii.bd.model.Progetto;
 import it.uniroma2.dicii.bd.model.dao.ConnectionFactory;
 import it.uniroma2.dicii.bd.model.Canale;
 import it.uniroma2.dicii.bd.utils.Printer;
@@ -106,4 +107,57 @@ public class InserisciMessaggioDAO {
 
 
 
+    /* Metodo per recuperare una lista di progetti con cf di dipendente richiedente, chiamato da controller */
+    public static List<Progetto> recuperoListProgetti() throws SQLException{
+
+        List<Progetto> progettiTarget = new ArrayList<>();
+        Connection conn = null;
+        CallableStatement cs = null;
+        ResultSet rs = null;
+
+        try {
+            conn = ConnectionFactory.getConnection();
+            UserSession session = UserSession.getInstance();
+
+            // Prepara la chiamata alla stored procedure
+            cs = conn.prepareCall("{call lista_progetti_appartenenti(?)}");
+            cs.setString(1, session.getCf());
+
+            // Esegui la stored procedure
+            boolean result = cs.execute();
+
+            // Se c'è un result set
+            if (result) {
+                rs = cs.getResultSet();
+                while (rs.next()) {
+                    // Creazione di un nuovo oggetto Progetto
+                    Progetto progetto = new Progetto();
+                    progetto.setId(rs.getInt("IDProgetto"));
+                    progetto.setNome(rs.getString("Nome"));
+                    progetto.setDataInzio(rs.getDate("DataInizio"));
+                    progetto.setDataScadenza(rs.getDate("DataScadenza"));
+
+
+                    // Aggiungi il progetto alla lista
+                    progettiTarget.add(progetto);
+                }
+            }
+        } catch (SQLException e) {
+            Printer.errorMessage("Errore SQL: " + e.getMessage());
+        }
+
+        return progettiTarget;
+    }
+
+
+
+
 }
+
+
+
+
+
+
+
+
