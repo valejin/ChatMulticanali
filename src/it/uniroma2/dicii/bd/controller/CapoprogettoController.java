@@ -3,9 +3,11 @@ package it.uniroma2.dicii.bd.controller;
 import it.uniroma2.dicii.bd.bean.CanaleBean;
 import it.uniroma2.dicii.bd.exception.DAOException;
 import it.uniroma2.dicii.bd.model.Canale;
+import it.uniroma2.dicii.bd.model.Lavoratore;
 import it.uniroma2.dicii.bd.model.Messaggio;
 import it.uniroma2.dicii.bd.model.Progetto;
 import it.uniroma2.dicii.bd.model.dao.ConnectionFactory;
+import it.uniroma2.dicii.bd.model.dao.capoprogetto.AssegnaCanaleDAO;
 import it.uniroma2.dicii.bd.model.dao.capoprogetto.CreaCanaleDAO;
 import it.uniroma2.dicii.bd.model.dao.capoprogetto.InserisciMessaggioDAO;
 import it.uniroma2.dicii.bd.model.dao.capoprogetto.VisualizzaConversazioneDAO;
@@ -15,6 +17,7 @@ import it.uniroma2.dicii.bd.view.CapoprogettoView;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CapoprogettoController implements Controller{
@@ -43,6 +46,7 @@ public class CapoprogettoController implements Controller{
                 case 1 -> creaCanale();
                 case 2 -> inserisciNuovoMessaggio();
                 case 3 -> visualizzaConversazione();
+                case 4 -> assegnaCanale();
                 case 0 -> System.exit(0);
                 default -> throw new RuntimeException("Invalid choice");
             }
@@ -190,7 +194,7 @@ public class CapoprogettoController implements Controller{
 
 
 
-    /* Metodo per memorizzare la risposta privata in DB */
+    /* NUOVO METODO, DA PROVARE: Metodo per memorizzare la risposta privata in DB */
     public void memorizzaRispostaPrivata(Messaggio messaggioOriginale, String contenutoRisposta){
 
         try {
@@ -201,14 +205,7 @@ public class CapoprogettoController implements Controller{
             e.printStackTrace();
         }
 
-
     }
-
-
-
-
-
-
 
 
 
@@ -234,6 +231,45 @@ public class CapoprogettoController implements Controller{
     }
 
 
+
+
+    /* Metodo per assegnare il canale a un lavoratore che appartenente a un progetto, chiamato da switch case 4 */
+    public void assegnaCanale(){
+
+        // Chiama VIEW per stampare a schermo i progetti e i canali, restituisce da VIEW il lavoratore scelto
+        CapoprogettoView capoprogettoView = new CapoprogettoView();
+        Object[] infoLavoratore = capoprogettoView.assegnaCanale();
+
+        // Viene restituito ID progetto e ID canale
+        Lavoratore lavoratore = (Lavoratore) infoLavoratore[0];
+        int idCanaleScelto = (int) infoLavoratore[1];
+        int idProgettoScelto = (int) infoLavoratore[2];
+
+
+        // Chiama DAO per memorizzare tale assegnazione
+        AssegnaCanaleDAO assegnaCanaleDAO = new AssegnaCanaleDAO();
+        assegnaCanaleDAO.salvaAssegnazioneCanale(lavoratore, idCanaleScelto, idProgettoScelto);
+
+
+        Printer.printlnViola("Assegnazione avvenuta con successo!");
+
+
+    }
+
+
+
+    /* Metodo per recuperare la lista di lavoratori appartenente al progetto scelto da capo, chiamato da VIEW*/
+    public List<Lavoratore> recuperoLavoratori(int idProgetto){
+
+        AssegnaCanaleDAO assegnaCanaleDAO = new AssegnaCanaleDAO();
+        List<Lavoratore> lavoratori = new ArrayList<>();
+
+        lavoratori = assegnaCanaleDAO.recuperoLavoratoriByIdProgetto(idProgetto);
+        // il metodo restituisce una lista di lavoratori
+
+        return lavoratori;
+
+    }
 
 
 }

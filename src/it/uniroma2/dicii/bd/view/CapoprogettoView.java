@@ -3,6 +3,7 @@ package it.uniroma2.dicii.bd.view;
 import it.uniroma2.dicii.bd.bean.CanaleBean;
 import it.uniroma2.dicii.bd.controller.CapoprogettoController;
 import it.uniroma2.dicii.bd.model.Canale;
+import it.uniroma2.dicii.bd.model.Lavoratore;
 import it.uniroma2.dicii.bd.model.Messaggio;
 import it.uniroma2.dicii.bd.model.Progetto;
 import it.uniroma2.dicii.bd.utils.Printer;
@@ -27,10 +28,11 @@ public class CapoprogettoView {
 
     public static int stampaMenu() throws IOException {
 
-        Printer.printlnBlu("\n------- SCEGLI TRA OPERAZIONI ------\n");
+        Printer.printlnBlu("\n------- SCEGLI TRA OPERAZIONI ------");
         Printer.println("1) Crea nuovo canale");
         Printer.println("2) Inserisci messaggio");
         Printer.println("3) Visualizza conversazione");
+        Printer.println("4) Assegna canale");
         Printer.println("0) Quit");
 
 
@@ -39,7 +41,7 @@ public class CapoprogettoView {
         while (true) {
             Printer.print("Please enter your choice: ");
             choice = input.nextInt();
-            if (choice >= 0 && choice <= 3) {  //da cambiare il valore di limite
+            if (choice >= 0 && choice <= 4) {  //da cambiare il valore di limite
                 break;
             }
             Printer.println("Invalid option");
@@ -244,7 +246,7 @@ public class CapoprogettoView {
 
 
 
-    /* Metodo per stampare le pagine di messaggi, chiamato da controller */
+    /* RISPOSTA PRIVATA DA RIVEDERE: Metodo per stampare le pagine di messaggi, chiamato da controller */
     public void stampaConversazione(List<Messaggio> conversazione, int idCanale, int idProgetto, int tipoCanale) {
         /* I messaggi sono organizzati in pagine e i capi progetto e dipendenti possono visualizzare,
         una per una, le pagine della conversazione.*/
@@ -408,10 +410,86 @@ public class CapoprogettoView {
 
 
 
-    //il metodo per inserire il contenuto di messaggio risposta, posso rispondere in modo pubblico su canale
-    //o in modo privato creando un canale di comunicazione privato
+    /* Metodo per assegnare un canale a un lavoratore appartenente al progetto */
+    public Object[] assegnaCanale(){
 
-    /* Metodo per rispondere un messaggio scelto da utente, chiamato dal VIEW mentre stampa conversazione */
+        Scanner input = new Scanner(System.in);
+
+        Printer.printlnBlu("\n***** ASSEGNAZIONE CANALE *****");
+
+        CapoprogettoController capoprogettoController = new CapoprogettoController();
+
+        List<Progetto> progettiCoordinati = capoprogettoController.recuperoProgetti();
+
+        Printer.println("\nLista di progetti da te coordinati: ");
+
+        // Itera e stampa dei dettagli dei progetti con capoprogetto loggato
+        for (Progetto progetto : progettiCoordinati) {
+            Printer.println("ID Progetto: " + progetto.getId());
+            Printer.println("Nome Progetto: " + progetto.getNome());
+            Printer.println("Data Inizio: " + progetto.getDataInzio());
+            Printer.println("Data Scadenza: " + progetto.getDataScadenza());
+            Printer.println("-------------------------------");
+        }
+
+        // Chiedi all'utente di scegliere l'ID del progetto
+        Printer.print("\nInserisci l'ID del progetto a cui vuoi coordinare i canali: ");
+        int idProgettoScelto = input.nextInt();
+        input.nextLine();  // Consuma la newline
+
+        // Chiama il metodo di controller che restituisce tutti i canali di tale progetto
+        Printer.printlnBlu("\nLista di canali disponibili per il progetto scelto: ");
+        List<Canale> canaleList = capoprogettoController.recuperoCanali(idProgettoScelto);
+
+        // Itera e stampa i canali che appartengono al id progetto scelto
+        for (Canale canale : canaleList) {
+            Printer.println("ID Canale: " + canale.getIdCanale());
+            Printer.println("Nome Canale: " + canale.getNome());
+            Printer.println("CF creatore: " + canale.getCfCreatore());
+            Printer.println("Data creazione: " + canale.getData());
+            Printer.println("Tipo di canale: " + canale.getTipo());
+            Printer.println("-------------------------------");
+        }
+
+        Printer.print("\nInserisci l'ID del canale che vuoi assegnare: ");
+        int idCanaleScelto = input.nextInt();
+        input.nextLine();  // Consuma la newline
+
+        // Lista dei lavoratori che appartiene al progetto scelto
+        Printer.println("\nLista dei lavoratori appartenenti al progetto scelto: ");
+        List<Lavoratore> lavoratoreList = capoprogettoController.recuperoLavoratori(idProgettoScelto);
+
+
+        int index = 1;
+        // Stampo la lista di lavoratori
+        for (Lavoratore lavoratore : lavoratoreList) {
+            Printer.println(index + ". CF lavoratore: " + lavoratore.getCfLavoratore());
+            Printer.println("   Nome lavoratore: " + lavoratore.getNomeLavoratore());
+            Printer.println("   Cognome lavoratore: " + lavoratore.getCognomeLavoratore());
+            Printer.println("   Ruolo: " + lavoratore.getRuolo());
+            Printer.println("-------------------------------");
+            index++;
+        }
+
+        // Chiedi all'utente di scegliere il lavoratore per numero
+        Printer.print("\nInserisci il numero del lavoratore che vuoi assegnare al canale: ");
+        int lavoratoreSceltoIndex = input.nextInt();
+        input.nextLine();  // Consuma la newline
+
+        Lavoratore lavoratoreScelto = new Lavoratore();
+
+        // Recupera il lavoratore selezionato dalla lista usando l'indice
+        if (lavoratoreSceltoIndex > 0 && lavoratoreSceltoIndex <= lavoratoreList.size()) {
+            lavoratoreScelto = lavoratoreList.get(lavoratoreSceltoIndex - 1);
+
+        }else {
+            Printer.println("Numero del lavoratore non valido. Operazione annullata.");
+        }
+
+        return new Object[] {lavoratoreScelto, idCanaleScelto, idProgettoScelto};
+    }
+
+
 
 
 
