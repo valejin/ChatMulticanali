@@ -7,6 +7,7 @@ import it.uniroma2.dicii.bd.model.Lavoratore;
 import it.uniroma2.dicii.bd.model.Messaggio;
 import it.uniroma2.dicii.bd.model.Progetto;
 import it.uniroma2.dicii.bd.model.dao.ConnectionFactory;
+import it.uniroma2.dicii.bd.model.dao.VisualizzaAppartenenzaCanaliDAO;
 import it.uniroma2.dicii.bd.model.dao.capoprogetto.AssegnaCanaleDAO;
 import it.uniroma2.dicii.bd.model.dao.capoprogetto.CreaCanaleDAO;
 import it.uniroma2.dicii.bd.model.dao.InserisciMessaggioDAO;
@@ -17,7 +18,6 @@ import it.uniroma2.dicii.bd.view.CapoprogettoView;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class CapoprogettoController implements Controller{
@@ -47,6 +47,8 @@ public class CapoprogettoController implements Controller{
                 case 2 -> inserisciNuovoMessaggio();
                 case 3 -> visualizzaConversazione();
                 case 4 -> assegnaCanale();
+                case 5 -> visualizzaAppartenenzaProgetti();
+                case 6 -> visualizzaAppartenenzaCanali();
                 case 0 -> System.exit(0);
                 default -> throw new RuntimeException("Invalid choice");
             }
@@ -262,14 +264,42 @@ public class CapoprogettoController implements Controller{
     public List<Lavoratore> recuperoLavoratori(int idProgetto){
 
         AssegnaCanaleDAO assegnaCanaleDAO = new AssegnaCanaleDAO();
-        List<Lavoratore> lavoratori = new ArrayList<>();
+        List<Lavoratore> lavoratori;
 
         lavoratori = assegnaCanaleDAO.recuperoLavoratoriByIdProgetto(idProgetto);
         // il metodo restituisce una lista di lavoratori
 
         return lavoratori;
+    }
+
+
+
+    /* Metodo per restituire a utente tutti i progetti a cui esso fa parte, chiamato da switch case 5 */
+    public void visualizzaAppartenenzaProgetti(){
+
+        CapoprogettoView capoprogettoView = new CapoprogettoView();
+        capoprogettoView.listaProgetti();
+    }
+
+
+    /* Metodo per restituire a utente tutti i canali a cui esso fa parte, chiamato da switch case 6*/
+    public void visualizzaAppartenenzaCanali(){
+
+        CapoprogettoView capoprogettoView = new CapoprogettoView();
+        capoprogettoView.listaCanali();
 
     }
+
+
+    /* Metodo per recuperare la lista di canali appartenenti da DB, chiamato da VIEW */
+    public List<Canale> recuperoCanaliAppartenenti(){
+
+        List<Canale> canaliTarget = null;
+        canaliTarget = VisualizzaAppartenenzaCanaliDAO.recuperaCanali();
+
+        return canaliTarget;
+    }
+
 
 
 }

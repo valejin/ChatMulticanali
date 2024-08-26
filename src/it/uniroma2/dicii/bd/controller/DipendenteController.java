@@ -6,6 +6,7 @@ import it.uniroma2.dicii.bd.model.Messaggio;
 import it.uniroma2.dicii.bd.model.Progetto;
 import it.uniroma2.dicii.bd.model.dao.ConnectionFactory;
 import it.uniroma2.dicii.bd.model.dao.InserisciMessaggioDAO;
+import it.uniroma2.dicii.bd.model.dao.VisualizzaAppartenenzaCanaliDAO;
 import it.uniroma2.dicii.bd.model.dao.capoprogetto.CreaCanaleDAO;
 import it.uniroma2.dicii.bd.model.dao.capoprogetto.VisualizzaConversazioneDAO;
 import it.uniroma2.dicii.bd.model.domain.Role;
@@ -42,7 +43,7 @@ public class DipendenteController implements Controller{
                 case 1 -> inserisciNuovoMessaggio();
                 //case 2 -> visualizzaConversazione();    // da implementare
                 case 3 -> visualizzaAppartenenzaProgetti();
-                //case 4 -> visualizzaAppartenenzaCanali();
+                case 4 -> visualizzaAppartenenzaCanali();
                 case 0 -> System.exit(0);
                 default -> throw new RuntimeException("Invalid choice");
             }
@@ -145,7 +146,27 @@ public class DipendenteController implements Controller{
 
         DipendenteView dipendenteView = new DipendenteView();
         dipendenteView.listaProgetti();
+    }
 
+
+
+
+    /* Metodo per restituire a utente tutti i canali a cui esso fa parte, chiamato da switch case 4 */
+    public void visualizzaAppartenenzaCanali(){
+
+        DipendenteView dipendenteView = new DipendenteView();
+        dipendenteView.listaCanali();
+
+    }
+
+
+    /* Metodo per recuperare la lista di canali appartenenti da DB, chiamato da VIEW */
+    public List<Canale> recuperoCanaliAppartenenti(){
+
+        List<Canale> canaliTarget = null;
+        canaliTarget = VisualizzaAppartenenzaCanaliDAO.recuperaCanali();
+
+        return canaliTarget;
     }
 
 

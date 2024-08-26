@@ -2,6 +2,7 @@ package it.uniroma2.dicii.bd.view;
 
 import it.uniroma2.dicii.bd.bean.CanaleBean;
 import it.uniroma2.dicii.bd.controller.CapoprogettoController;
+import it.uniroma2.dicii.bd.controller.DipendenteController;
 import it.uniroma2.dicii.bd.model.Canale;
 import it.uniroma2.dicii.bd.model.Lavoratore;
 import it.uniroma2.dicii.bd.model.Messaggio;
@@ -33,6 +34,8 @@ public class CapoprogettoView {
         Printer.println("2) Inserisci messaggio");
         Printer.println("3) Visualizza conversazione");
         Printer.println("4) Assegna canale");
+        Printer.println("5) Visualizza partecipazione progetti");
+        Printer.println("6) Visualizza appartenenza canali");
         Printer.println("0) Quit");
 
 
@@ -41,10 +44,10 @@ public class CapoprogettoView {
         while (true) {
             Printer.print("Please enter your choice: ");
             choice = input.nextInt();
-            if (choice >= 0 && choice <= 4) {  //da cambiare il valore di limite
+            if (choice >= 0 && choice <= 6) {  //da cambiare il valore di limite
                 break;
             }
-            Printer.println("Invalid option");
+            Printer.errorMessage("Invalid option");
         }
 
         return choice;
@@ -187,7 +190,7 @@ public class CapoprogettoView {
         Printer.printlnBlu("\nLista di progetti a cui fa parte: ");
 
         // Stampo lista di progetti a cui fa parte
-        List<Progetto> progettiCandidati = new ArrayList<>();
+        List<Progetto> progettiCandidati;
 
         CapoprogettoController capoprogettoController = new CapoprogettoController();
 
@@ -254,7 +257,6 @@ public class CapoprogettoView {
         Scanner scanner = new Scanner(System.in);
         int messaggiPerPagina = 5;  // Numero di messaggi per pagina
         List<Messaggio> messaggiDaVisualizzare = new ArrayList<>();
-        UserSession session = UserSession.getInstance();
 
 
         // Filtra i messaggi in base al tipo di canale
@@ -487,6 +489,63 @@ public class CapoprogettoView {
         }
 
         return new Object[] {lavoratoreScelto, idCanaleScelto, idProgettoScelto};
+    }
+
+
+
+    /* Metodo per visualizzare i progetti a cui fa parte */
+    public void listaProgetti() {
+
+        Printer.printlnBlu("\n***** VISUALIZZA PARTECIPAZIONE PROGETTI *****");
+
+        // L'utente devo scegliere ID progetto a cui fa parte
+        Printer.printlnBlu("\nLista di progetti a cui fa parte: ");
+
+        // Stampo lista di progetti a cui fa parte
+        List<Progetto> progettiCandidati;
+
+        // Chiama il metodo di controller per restituire i progetti
+        progettiCandidati = CapoprogettoController.recuperoProgetti();
+
+        // Itera e stampa dei dettagli dei progetti con capoprogetto loggato
+        for (Progetto progetto : progettiCandidati) {
+            Printer.println("ID Progetto: " + progetto.getId());
+            Printer.println("Nome Progetto: " + progetto.getNome());
+            Printer.println("Data Inizio: " + progetto.getDataInzio());
+            Printer.println("Data Scadenza: " + progetto.getDataScadenza());
+            Printer.println("-------------------------------");
+        }
+
+
+    }
+
+
+
+    /* Metodo per visualizzare lista di canali a cui fa parte, chiamato da controller */
+    public void listaCanali(){
+        Printer.printlnBlu("\n***** VISUALIZZA APPARTENENZA CANALI *****");
+
+        Printer.printlnBlu("\nLista di canali a cui fa parte: ");
+
+        // Stampo lista di progetti a cui fa parte
+        List<Canale> canaleList;
+        CapoprogettoController capoprogettoController = new CapoprogettoController();
+
+        // Chiama il metodo di controller per restituire i progetti
+        canaleList = capoprogettoController.recuperoCanaliAppartenenti();
+
+        // Itera e stampa i canali che appartengono al id progetto scelto
+        for (Canale canale : canaleList) {
+            Printer.println("ID Canale: " + canale.getIdCanale());
+            Printer.println("ID Progetto: " + canale.getIdProgetto());
+            Printer.println("Nome Canale: " + canale.getNome());
+            Printer.println("CF creatore: " + canale.getCfCreatore());
+            Printer.println("Data creazione: " + canale.getData());
+            Printer.println("Tipo di canale: " + canale.getTipo());
+            Printer.println("-------------------------------");
+        }
+
+
     }
 
 

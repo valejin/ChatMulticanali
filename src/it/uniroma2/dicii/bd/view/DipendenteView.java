@@ -26,7 +26,7 @@ public class DipendenteView {
         Printer.println("1) Inserisci messaggio");
         Printer.println("2) Visualizza conversazione");   // da implementare
         Printer.println("3) Visualizza partecipazione progetti");
-        //Printer.println("4) Visualizza appartenenza canale");
+        Printer.println("4) Visualizza appartenenza canali");
         Printer.println("0) Quit");
 
 
@@ -192,14 +192,11 @@ public class DipendenteView {
 
 
 
-    /* Metodo per visualizzare i progetti a cui fa parte */
+    /* Metodo per visualizzare i progetti a cui fa parte, chiamato da controller */
     public void listaProgetti(){
-
-        Scanner input = new Scanner(System.in);
 
         Printer.printlnBlu("\n***** VISUALIZZA PARTECIPAZIONE PROGETTI *****");
 
-        // L'utente devo scegliere ID progetto a cui fa parte, poi ID canale a cui fa parte
         Printer.printlnBlu("\nLista di progetti a cui fa parte: ");
 
         // Stampo lista di progetti a cui fa parte
@@ -218,11 +215,37 @@ public class DipendenteView {
             Printer.println("-------------------------------");
         }
 
-
-
     }
 
 
+
+
+    /* Metodo per visualizzare lista di canali a cui fa parte, chiamato da controller */
+    public void listaCanali(){
+        Printer.printlnBlu("\n***** VISUALIZZA APPARTENENZA CANALI *****");
+
+        Printer.printlnBlu("\nLista di canali a cui fa parte: ");
+
+        // Stampo lista di progetti a cui fa parte
+        List<Canale> canaleList;
+        DipendenteController dipendenteController = new DipendenteController();
+
+        // Chiama il metodo di controller per restituire i progetti
+        canaleList = dipendenteController.recuperoCanaliAppartenenti();
+
+        // Itera e stampa i canali che appartengono al id progetto scelto
+        for (Canale canale : canaleList) {
+            Printer.println("ID Canale: " + canale.getIdCanale());
+            Printer.println("ID Progetto: " + canale.getIdProgetto());
+            Printer.println("Nome Canale: " + canale.getNome());
+            Printer.println("CF creatore: " + canale.getCfCreatore());
+            Printer.println("Data creazione: " + canale.getData());
+            Printer.println("Tipo di canale: " + canale.getTipo());
+            Printer.println("-------------------------------");
+        }
+
+
+    }
 
 
 
