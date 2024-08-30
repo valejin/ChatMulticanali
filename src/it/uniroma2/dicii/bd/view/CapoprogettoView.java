@@ -240,20 +240,20 @@ public class CapoprogettoView {
 
         // Restituisce un array contenente l'ID del canale, l'ID del progetto e il tipo di canale
         return new Object[] {idCanaleScelto, idProgettoScelto, tipoCanaleScelto};    //qui bisogna passare anche il tipo di canale
-
     }
+
+
 
 
 
     /* Metodo per stampare le pagine di messaggi di un canale pubblico, chiamato da controller */
     public void stampaConversazione(List<Messaggio> conversazione, int idCanale, int idProgetto, int tipoCanale) {
-        /* I messaggi sono organizzati in pagine e i capi progetto e dipendenti possono visualizzare,
-        una per una, le pagine della conversazione.*/
-
         Scanner scanner = new Scanner(System.in);
         int messaggiPerPagina = 5;  // Numero di messaggi per pagina
         List<Messaggio> messaggiDaVisualizzare = new ArrayList<>();
 
+        /* I messaggi sono organizzati in pagine e i capi progetto e dipendenti possono visualizzare,
+        una per una, le pagine della conversazione.*/
 
         // Filtra i messaggi in base al tipo di canale
         if (tipoCanale == 1) {  // Canale pubblico
@@ -266,7 +266,6 @@ public class CapoprogettoView {
             messaggiDaVisualizzare.addAll(conversazione);
         }
 
-
         int numeroPagine = (int) Math.ceil((double) messaggiDaVisualizzare.size() / messaggiPerPagina);
         int paginaCorrente = 0;
 
@@ -285,18 +284,7 @@ public class CapoprogettoView {
                 if (messaggio.isRisposta()) {
                     // Cerca l'indice del messaggio originale
                     Messaggio messaggioOriginale = messaggio.getMessaggioOriginale();
-                    int numeroMessaggioOriginale = -1;
-
-                    for (int j = 0; j < messaggiDaVisualizzare.size(); j++) {
-                        Messaggio msg = messaggiDaVisualizzare.get(j);
-                        // Confronta gli attributi unici per identificare il messaggio originale
-                        if (msg.getCfUtente().equals(messaggioOriginale.getCfUtente())
-                                && msg.getDataInvio().equals(messaggioOriginale.getDataInvio())
-                                && msg.getOrarioInvio().equals(messaggioOriginale.getOrarioInvio())) {
-                            numeroMessaggioOriginale = j + 1; // Indice del messaggio originale (inizia da 1)
-                            break;
-                        }
-                    }
+                    int numeroMessaggioOriginale = trovaIndiceMessaggioOriginale(messaggiDaVisualizzare, messaggioOriginale);
 
                     if (numeroMessaggioOriginale != -1) {
                         Printer.printlnViola("Risposta al Messaggio #" + numeroMessaggioOriginale);
@@ -312,7 +300,6 @@ public class CapoprogettoView {
                 Printer.println("Orario Invio: " + messaggio.getOrarioInvio());
                 Printer.println("Contenuto: " + messaggio.getContenuto());
                 Printer.println("-------------------------------");
-
             }
 
             // Chiedi all'utente cosa fare
@@ -324,91 +311,96 @@ public class CapoprogettoView {
             } else if (scelta == 2 && paginaCorrente < numeroPagine - 1) {
                 paginaCorrente++;  // Vai alla pagina successiva
             } else if (scelta == 3) {
-                Printer.print("\nInserisci il numero del messaggio a cui vuoi rispondere: ");
-
-                int numeroMessaggio = scanner.nextInt();
-                scanner.nextLine();
-                Messaggio messaggioOriginale = messaggiDaVisualizzare.get(numeroMessaggio - 1);
-                messaggioOriginale.setIdCanale(idCanale);
-                messaggioOriginale.setIdProgetto(idProgetto);
-
-                Printer.println("\nVuoi rispondere in [1] Pubblico o [2] Privato?");
-                int sceltaRisposta = scanner.nextInt();
-                scanner.nextLine();
-
-                if (sceltaRisposta == 1) {
-                    // Risposta pubblica
-                    Printer.print("Inserisci la risposta: ");
-                    String contenutoRisposta = scanner.nextLine();
-
-                    // Chiama il metodo di controller per memorizzare la risposta in DB
-                    CapoprogettoController capoprogettoController = new CapoprogettoController();
-                    capoprogettoController.rispostaPublic(messaggioOriginale, contenutoRisposta);
-
-                } else if (sceltaRisposta == 2) {
-                    // Risposta privata
-                    Printer.print("Inserisci il tuo messaggio privato: ");
-                    String contenutoRispostaPrivata = scanner.nextLine();
-
-
-                    // NUOVO METODO: Chiamo controller per memorizzare il messaggio di risposta privata
-                    CapoprogettoController capoprogettoController = new CapoprogettoController();
-                    capoprogettoController.memorizzaRispostaPrivata(messaggioOriginale, contenutoRispostaPrivata);
-
+                if (tipoCanale == 1) {
+                    rispondiAMessaggioPubblicoPrivato(messaggiDaVisualizzare, scanner, idCanale, idProgetto);
+                    break;
+                } else if (tipoCanale == 2) {
+                    rispondiAMessaggioPubblico(messaggiDaVisualizzare, scanner, idCanale, idProgetto);
+                    break;
                 }
-
             } else if (scelta == 0) {
                 break;  // Esci dalla visualizzazione
             } else {
                 Printer.errorMessage("Scelta non valida, riprova.");
             }
         }
-
     }
+
+    private int trovaIndiceMessaggioOriginale(List<Messaggio> messaggiDaVisualizzare, Messaggio messaggioOriginale) {
+        for (int j = 0; j < messaggiDaVisualizzare.size(); j++) {
+            Messaggio msg = messaggiDaVisualizzare.get(j);
+            if (msg.getCfUtente().equals(messaggioOriginale.getCfUtente())
+                    && msg.getDataInvio().equals(messaggioOriginale.getDataInvio())
+                    && msg.getOrarioInvio().equals(messaggioOriginale.getOrarioInvio())) {
+                return j + 1; // Indice del messaggio originale (inizia da 1)
+            }
+        }
+        return -1;
+    }
+
+    private void rispondiAMessaggioPubblicoPrivato(List<Messaggio> messaggiDaVisualizzare, Scanner scanner, int idCanale, int idProgetto) {
+        Printer.print("\nInserisci il numero del messaggio a cui vuoi rispondere: ");
+        int numeroMessaggio = scanner.nextInt();
+        scanner.nextLine();
+
+        Messaggio messaggioOriginale = messaggiDaVisualizzare.get(numeroMessaggio - 1);
+        messaggioOriginale.setIdCanale(idCanale);
+        messaggioOriginale.setIdProgetto(idProgetto);
+
+        Printer.println("\nVuoi rispondere in [1] Pubblico o [2] Privato?");
+        int sceltaRisposta = scanner.nextInt();
+        scanner.nextLine();
+
+        CapoprogettoController capoprogettoController = new CapoprogettoController();
+        if (sceltaRisposta == 1) {
+            // Risposta pubblica
+            Printer.print("Inserisci la risposta: ");
+            String contenutoRisposta = scanner.nextLine();
+            capoprogettoController.rispostaPublic(messaggioOriginale, contenutoRisposta);
+        } else if (sceltaRisposta == 2) {
+            // Risposta privata
+            Printer.print("Inserisci il tuo messaggio privato: ");
+            String contenutoRispostaPrivata = scanner.nextLine();
+            capoprogettoController.memorizzaRispostaPrivata(messaggioOriginale, contenutoRispostaPrivata);
+        }
+    }
+
+    private void rispondiAMessaggioPubblico(List<Messaggio> messaggiDaVisualizzare, Scanner scanner, int idCanale, int idProgetto) {
+        Printer.print("\nInserisci il numero del messaggio a cui vuoi rispondere: ");
+        int numeroMessaggio = scanner.nextInt();
+        scanner.nextLine();
+
+        Messaggio messaggioOriginale = messaggiDaVisualizzare.get(numeroMessaggio - 1);
+        messaggioOriginale.setIdCanale(idCanale);
+        messaggioOriginale.setIdProgetto(idProgetto);
+
+        // Risposta pubblica automatica
+        Printer.print("Inserisci la risposta: ");
+        String contenutoRisposta = scanner.nextLine();
+
+        CapoprogettoController capoprogettoController = new CapoprogettoController();
+        capoprogettoController.rispostaPublic(messaggioOriginale, contenutoRisposta);
+    }
+
 
 
 
     /* Metodo NUOVO per stampare messaggi di un canale privata:
-    * - il messaggio originario: è il quale l'utente ha risposto in modo privato e viene creato un canale privato */
-
-
+     * - il messaggio originario: è il quale l'utente ha risposto in modo privato e viene creato un canale privato */
     public void stampaConversazionePrivata(List<Messaggio> conversazione, int idCanale, int idProgetto) {
+        Scanner scanner = new Scanner(System.in);
+        int messaggiPerPagina = 5;  // Numero di messaggi per pagina
+        List<Messaggio> messaggiDaVisualizzare = new ArrayList<>(conversazione);
+
         /* I messaggi sono organizzati in pagine e i capi progetto e dipendenti possono visualizzare,
         una per una, le pagine della conversazione.*/
 
-        Scanner scanner = new Scanner(System.in);
-        int messaggiPerPagina = 5;  // Numero di messaggi per pagina
-        List<Messaggio> messaggiDaVisualizzare = new ArrayList<>();
-
-
-        // Aggiungi tutti i messaggi della conversazione alla lista messaggiDaVisualizzare
-        messaggiDaVisualizzare.addAll(conversazione);
-
-
-        // Estrai il primo messaggio dalla lista
+        // Estrai il primo messaggio dalla lista e recupera il messaggio originale
         Messaggio primoMessaggio = messaggiDaVisualizzare.get(0);
-
-        // Ottieni il CF mittente
-        String cfMittente = primoMessaggio.getCfUtente();
-
-        // Ottieni la data di invio
-        Date dataInvio = primoMessaggio.getDataInvio();
-
-        // Ottieni l'orario di invio
-        Time orarioInvio = primoMessaggio.getOrarioInvio();
-
-        // qui devo mettere una funzione che recupera il primo messaggio originale che utente risponde privatamente
-        // chiama controller, che chiama DAO per recuperare Contenuto di messaggio originale
-        Messaggio messaggioOriginario = new Messaggio();
-        CapoprogettoController controller = new CapoprogettoController();
-        messaggioOriginario = controller.recuperoMessaggioOriginario(cfMittente, dataInvio, orarioInvio);
+        Messaggio messaggioOriginario = recuperaMessaggioOriginale(primoMessaggio);
 
         // Aggiungi il messaggio originario all'inizio della lista
         messaggiDaVisualizzare.add(0, messaggioOriginario);
-
-
-
-
 
         int numeroPagine = (int) Math.ceil((double) messaggiDaVisualizzare.size() / messaggiPerPagina);
         int paginaCorrente = 0;
@@ -426,21 +418,7 @@ public class CapoprogettoView {
                 int numeroMessaggio = i + 1;  // Numero univoco del messaggio
 
                 if (messaggio.isRisposta()) {
-                    // Cerca l'indice del messaggio originale
-                    Messaggio messaggioOriginale = messaggio.getMessaggioOriginale();
-                    int numeroMessaggioOriginale = -1;
-
-                    for (int j = 0; j < messaggiDaVisualizzare.size(); j++) {
-                        Messaggio msg = messaggiDaVisualizzare.get(j);
-                        // Confronta gli attributi unici per identificare il messaggio originale
-                        if (msg.getCfUtente().equals(messaggioOriginale.getCfUtente())
-                                && msg.getDataInvio().equals(messaggioOriginale.getDataInvio())
-                                && msg.getOrarioInvio().equals(messaggioOriginale.getOrarioInvio())) {
-                            numeroMessaggioOriginale = j + 1; // Indice del messaggio originale (inizia da 1)
-                            break;
-                        }
-                    }
-
+                    int numeroMessaggioOriginale = trovaIndiceMessaggioOriginale(messaggiDaVisualizzare, messaggio.getMessaggioOriginale());
                     if (numeroMessaggioOriginale != -1) {
                         Printer.printlnViola("Risposta al Messaggio #" + numeroMessaggioOriginale);
                     } else {
@@ -455,7 +433,6 @@ public class CapoprogettoView {
                 Printer.println("Orario Invio: " + messaggio.getOrarioInvio());
                 Printer.println("Contenuto: " + messaggio.getContenuto());
                 Printer.println("-------------------------------");
-
             }
 
             // Chiedi all'utente cosa fare
@@ -467,36 +444,24 @@ public class CapoprogettoView {
             } else if (scelta == 2 && paginaCorrente < numeroPagine - 1) {
                 paginaCorrente++;  // Vai alla pagina successiva
             } else if (scelta == 3) {
-                Printer.print("\nInserisci il numero del messaggio a cui vuoi rispondere: ");
-
-                int numeroMessaggio = scanner.nextInt();
-                scanner.nextLine();
-                Messaggio messaggioOriginale = messaggiDaVisualizzare.get(numeroMessaggio - 1);
-                messaggioOriginale.setIdCanale(idCanale);
-                messaggioOriginale.setIdProgetto(idProgetto);
-
-                // Risposta pubblica automatica
-                Printer.print("Inserisci la risposta: ");
-                String contenutoRisposta = scanner.nextLine();
-
-                // Chiama il metodo di controller per memorizzare la risposta in DB
-                CapoprogettoController capoprogettoController = new CapoprogettoController();
-                capoprogettoController.rispostaPublic(messaggioOriginale, contenutoRisposta);
-
-
+                rispondiAMessaggioPubblico(messaggiDaVisualizzare, scanner, idCanale, idProgetto);
+                break;  // Esci dalla visualizzazione dopo aver risposto
             } else if (scelta == 0) {
                 break;  // Esci dalla visualizzazione
             } else {
                 Printer.errorMessage("Scelta non valida, riprova.");
             }
         }
-
     }
 
+    private Messaggio recuperaMessaggioOriginale(Messaggio primoMessaggio) {
+        String cfMittente = primoMessaggio.getCfUtente();
+        Date dataInvio = primoMessaggio.getDataInvio();
+        Time orarioInvio = primoMessaggio.getOrarioInvio();
 
-
-
-
+        CapoprogettoController controller = new CapoprogettoController();
+        return controller.recuperoMessaggioOriginario(cfMittente, dataInvio, orarioInvio);
+    }
 
 
 

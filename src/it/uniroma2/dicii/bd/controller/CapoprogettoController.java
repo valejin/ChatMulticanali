@@ -210,6 +210,19 @@ public class CapoprogettoController implements Controller{
 
 
 
+    /* Metodo per creare un canale di comunicazione privata, chiamata da VIEW */
+    public void creaCanalePrivata(CanaleBean canalePrivata){
+
+        CreaCanaleDAO creaCanaleDAO = new CreaCanaleDAO();
+
+        try {
+            creaCanaleDAO.inserireNuovoCanale(canalePrivata);
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+
+    }
+
 
 
     /* NUOVO METODO FUNZIONANTE: Metodo per memorizzare la risposta privata in DB */
@@ -225,6 +238,28 @@ public class CapoprogettoController implements Controller{
 
     }
 
+
+
+
+
+
+
+
+    /* Metodo per salvare la risposta privata di utente in DB, chiamato da VIEW */
+    public void rispostaPrivate(Messaggio messaggioOriginale, String contenutoRisposta){
+
+        try {
+            // Nel messaggio originario contiene già idCanale e idProgetto
+            // Il messaggio in DB viene identificato da CFrispondente, DataInvio e OrarioInvio
+            VisualizzaConversazioneDAO.inserisciRisposta(messaggioOriginale, contenutoRisposta, 1);
+            Printer.println("Risposta privata inviata con successo.");
+
+
+        } catch (DAOException e) {
+            Printer.errorMessage("Errore durante l'invio della risposta privata.");
+        }
+
+    }
 
 
 
