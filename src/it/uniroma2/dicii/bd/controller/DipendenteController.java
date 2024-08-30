@@ -1,14 +1,12 @@
 package it.uniroma2.dicii.bd.controller;
 
+import it.uniroma2.dicii.bd.dao.*;
 import it.uniroma2.dicii.bd.exception.DAOException;
 import it.uniroma2.dicii.bd.model.Canale;
+import it.uniroma2.dicii.bd.model.Lavoratore;
 import it.uniroma2.dicii.bd.model.Messaggio;
 import it.uniroma2.dicii.bd.model.Progetto;
-import it.uniroma2.dicii.bd.model.dao.ConnectionFactory;
-import it.uniroma2.dicii.bd.model.dao.InserisciMessaggioDAO;
-import it.uniroma2.dicii.bd.model.dao.VisualizzaAppartenenzaCanaliDAO;
-import it.uniroma2.dicii.bd.model.dao.capoprogetto.CreaCanaleDAO;
-import it.uniroma2.dicii.bd.model.dao.capoprogetto.VisualizzaConversazioneDAO;
+import it.uniroma2.dicii.bd.dao.capoprogetto.CreaCanaleDAO;
 import it.uniroma2.dicii.bd.model.domain.Role;
 import it.uniroma2.dicii.bd.utils.Printer;
 import it.uniroma2.dicii.bd.view.DipendenteView;
@@ -43,9 +41,10 @@ public class DipendenteController implements Controller{
 
             switch(choice) {
                 case 1 -> inserisciNuovoMessaggio();
-                case 2 -> visualizzaConversazione();    // da implementare
+                case 2 -> visualizzaConversazione();
                 case 3 -> visualizzaAppartenenzaProgetti();
                 case 4 -> visualizzaAppartenenzaCanali();
+                case 5 -> visualizzaPartecipantiCanali();
                 case 0 -> System.exit(0);
                 default -> throw new RuntimeException("Invalid choice");
             }
@@ -79,9 +78,7 @@ public class DipendenteController implements Controller{
     /* Metodo per recuperare lista di progetti con cf di dipendente da DB, chiamato da VIEW */
     public static List<Progetto> recuperoProgetti(){
 
-        CreaCanaleDAO creaCanaleDAO = new CreaCanaleDAO();
         List<Progetto> progettiTarget = null;
-
 
         try {
             progettiTarget = InserisciMessaggioDAO.recuperoListProgetti();
@@ -207,10 +204,6 @@ public class DipendenteController implements Controller{
 
 
 
-
-
-
-
     /* Metodo per restituire a utente tutti i progetti a cui esso fa parte, chiamato da switch case 3 */
     public void visualizzaAppartenenzaProgetti(){
 
@@ -240,5 +233,26 @@ public class DipendenteController implements Controller{
     }
 
 
+
+
+    /* Metodo per visualizzare i partecipanti del canale scelto, chiamato da switch case 5 */
+    public void visualizzaPartecipantiCanali(){
+
+        DipendenteView dipendenteView = new DipendenteView();
+        dipendenteView.visualizzaPartecipantiCanali();
+
+    }
+
+
+
+    /* Metodo per recuperare la lista dei lavoratori appartenenti a un canale scelto, chiamato da VIEW */
+    public List<Lavoratore> recuperoLavoratoriByCanale(int idCanale, int idProgetto){
+
+        List<Lavoratore> lavoratori;
+        VisualizzaPartecipantiCanaleDAO visualizzaPartecipantiCanaleDAO = new VisualizzaPartecipantiCanaleDAO();
+        lavoratori = visualizzaPartecipantiCanaleDAO.recuperoLavoratoriByCanale(idCanale,idProgetto);
+
+        return lavoratori;
+    }
 
 }

@@ -1,7 +1,7 @@
 package it.uniroma2.dicii.bd.controller;
 
 import it.uniroma2.dicii.bd.exception.DAOException;
-import it.uniroma2.dicii.bd.model.dao.LoginProcedureDAO;
+import it.uniroma2.dicii.bd.dao.LoginProcedureDAO;
 import it.uniroma2.dicii.bd.model.domain.Credentials;
 import it.uniroma2.dicii.bd.utils.UserSession;
 import it.uniroma2.dicii.bd.view.LoginView;

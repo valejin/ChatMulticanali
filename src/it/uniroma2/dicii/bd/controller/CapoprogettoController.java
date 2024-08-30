@@ -1,17 +1,14 @@
 package it.uniroma2.dicii.bd.controller;
 
 import it.uniroma2.dicii.bd.bean.CanaleBean;
+import it.uniroma2.dicii.bd.dao.*;
 import it.uniroma2.dicii.bd.exception.DAOException;
 import it.uniroma2.dicii.bd.model.Canale;
 import it.uniroma2.dicii.bd.model.Lavoratore;
 import it.uniroma2.dicii.bd.model.Messaggio;
 import it.uniroma2.dicii.bd.model.Progetto;
-import it.uniroma2.dicii.bd.model.dao.ConnectionFactory;
-import it.uniroma2.dicii.bd.model.dao.VisualizzaAppartenenzaCanaliDAO;
-import it.uniroma2.dicii.bd.model.dao.capoprogetto.AssegnaCanaleDAO;
-import it.uniroma2.dicii.bd.model.dao.capoprogetto.CreaCanaleDAO;
-import it.uniroma2.dicii.bd.model.dao.InserisciMessaggioDAO;
-import it.uniroma2.dicii.bd.model.dao.capoprogetto.VisualizzaConversazioneDAO;
+import it.uniroma2.dicii.bd.dao.capoprogetto.AssegnaCanaleDAO;
+import it.uniroma2.dicii.bd.dao.capoprogetto.CreaCanaleDAO;
 import it.uniroma2.dicii.bd.model.domain.Role;
 import it.uniroma2.dicii.bd.utils.Printer;
 import it.uniroma2.dicii.bd.view.CapoprogettoView;
@@ -51,6 +48,10 @@ public class CapoprogettoController implements Controller{
                 case 4 -> assegnaCanale();
                 case 5 -> visualizzaAppartenenzaProgetti();
                 case 6 -> visualizzaAppartenenzaCanali();
+                case 7 -> visualizzaPartecipantiProgetto();
+                case 8 -> visualizzaPartecipantiCanali();
+                case 9 -> assegnaProgetto();
+                //case 10 -> visualizzaConversazionePrivata();
                 case 0 -> System.exit(0);
                 default -> throw new RuntimeException("Invalid choice");
             }
@@ -68,7 +69,6 @@ public class CapoprogettoController implements Controller{
         // Adesso devo inserire questo canaleBean in DB
         CreaCanaleDAO creaCanaleDAO = new CreaCanaleDAO();
 
-
         try{
             creaCanaleDAO.inserireNuovoCanale(canaleBean);
             Printer.println("Canale creato con successo!");
@@ -77,19 +77,16 @@ public class CapoprogettoController implements Controller{
             e.printStackTrace();  // Per debug, stampa lo stack trace
             throw new RuntimeException("Errore durante la creazione del canale: " + e.getMessage(), e);
         }
-
-
     }
 
 
 
 
-    /* Metodo per recuperare lista di progetti con cf di capoprogetto dato da DB, chiamato da VIEW */
+    /* Metodo per recuperare lista di progetti con cf di capoProgetto dato da DB, chiamato da VIEW */
     public static List<Progetto> recuperoProgetti(){
 
         CreaCanaleDAO creaCanaleDAO = new CreaCanaleDAO();
         List<Progetto> progettiTarget = null;
-
 
         try {
             progettiTarget = creaCanaleDAO.recuperoProgettiByCf();
@@ -111,7 +108,7 @@ public class CapoprogettoController implements Controller{
 
         Object[] datiMessaggio = CapoprogettoView.inserisciMessaggio();
 
-        // Estraggo le informazioni dall'array di oggetti
+        // Estraggo le informazioni da array di oggetti
         String contenutoMessaggio = (String) datiMessaggio[0];
         int idCanaleScelto = (int) datiMessaggio[1];
         int idProgettoScelto = (int) datiMessaggio[2];
@@ -184,7 +181,6 @@ public class CapoprogettoController implements Controller{
         }
 
         return messaggioOriginale;
-
     }
 
 
@@ -204,23 +200,9 @@ public class CapoprogettoController implements Controller{
         } catch (DAOException e) {
             Printer.errorMessage("Errore durante l'invio della risposta pubblica.");
         }
-
     }
 
 
-
-    /* Metodo per creare un canale di comunicazione privata, chiamata da VIEW */
-    public void creaCanalePrivata(CanaleBean canalePrivata){
-
-        CreaCanaleDAO creaCanaleDAO = new CreaCanaleDAO();
-
-        try {
-            creaCanaleDAO.inserireNuovoCanale(canalePrivata);
-        } catch (SQLException e){
-            e.printStackTrace();
-        }
-
-    }
 
 
 
@@ -234,31 +216,8 @@ public class CapoprogettoController implements Controller{
             Printer.errorMessage("Errore inserimento risposta privata in DB con nuovo metodo");
             e.printStackTrace();
         }
-
     }
 
-
-
-
-
-
-
-
-    /* Metodo per salvare la risposta privata di utente in DB, chiamato da VIEW */
-    public void rispostaPrivate(Messaggio messaggioOriginale, String contenutoRisposta){
-
-        try {
-            // Nel messaggio originario contiene già idCanale e idProgetto
-            // Il messaggio in DB viene identificato da CFrispondente, DataInvio e OrarioInvio
-            VisualizzaConversazioneDAO.inserisciRisposta(messaggioOriginale, contenutoRisposta, 1);
-            Printer.println("Risposta privata inviata con successo.");
-
-
-        } catch (DAOException e) {
-            Printer.errorMessage("Errore durante l'invio della risposta privata.");
-        }
-
-    }
 
 
 
@@ -275,21 +234,17 @@ public class CapoprogettoController implements Controller{
         int idCanaleScelto = (int) infoLavoratore[1];
         int idProgettoScelto = (int) infoLavoratore[2];
 
-
         // Chiama DAO per memorizzare tale assegnazione
         AssegnaCanaleDAO assegnaCanaleDAO = new AssegnaCanaleDAO();
         assegnaCanaleDAO.salvaAssegnazioneCanale(lavoratore, idCanaleScelto, idProgettoScelto);
 
-
         Printer.printlnViola("Assegnazione avvenuta con successo!");
-
-
     }
 
 
 
     /* Metodo per recuperare la lista di lavoratori appartenente al progetto scelto da capo, chiamato da VIEW*/
-    public List<Lavoratore> recuperoLavoratori(int idProgetto){
+    public static List<Lavoratore> recuperoLavoratori(int idProgetto){
 
         AssegnaCanaleDAO assegnaCanaleDAO = new AssegnaCanaleDAO();
         List<Lavoratore> lavoratori;
@@ -327,6 +282,96 @@ public class CapoprogettoController implements Controller{
 
         return canaliTarget;
     }
+
+
+
+
+    /* Metodo per visualizzare i partecipanti di un progetto, chiamato da switch case 7 */
+    public void visualizzaPartecipantiProgetto(){
+
+        CapoprogettoView capoprogettoView = new CapoprogettoView();
+        capoprogettoView.visualizzaPartecipantiProgetto();
+
+    }
+
+
+
+    /* Metodo per visualizzare i partecipanti di un canale scelto, chiamato da switch case 8 */
+    public void visualizzaPartecipantiCanali(){
+
+        CapoprogettoView capoprogettoView = new CapoprogettoView();
+        capoprogettoView.visualizzaPartecipantiCanali();
+
+    }
+
+
+
+    /* Metodo per recuperare la lista dei lavoratori appartenenti a un canale scelto, chiamato da VIEW */
+    public List<Lavoratore> recuperoLavoratoriByCanale(int idCanale, int idProgetto){
+
+        List<Lavoratore> lavoratori;
+        VisualizzaPartecipantiCanaleDAO visualizzaPartecipantiCanaleDAO = new VisualizzaPartecipantiCanaleDAO();
+        lavoratori = visualizzaPartecipantiCanaleDAO.recuperoLavoratoriByCanale(idCanale,idProgetto);
+
+        return lavoratori;
+    }
+
+
+
+
+    /* Metodo per assegnare un progetto a un lavoratore, chiamato da switch case 9 */
+    public void assegnaProgetto(){
+
+        CapoprogettoView capoprogettoView = new CapoprogettoView();
+
+        Object[] infoLavoratore = capoprogettoView.assegnaProgetto();
+
+        Lavoratore lavoratore = (Lavoratore) infoLavoratore[0];
+        int idProgettoScelto = (int) infoLavoratore[1];
+
+        // Chiama DAO per memorizzare in DB
+        AssegnaProgettoDAO assegnaProgettoDAO = new AssegnaProgettoDAO();
+        assegnaProgettoDAO.assegnaProgetto(lavoratore, idProgettoScelto);
+
+        Printer.printlnViola("L'assegnazione progetto avvenuta con successo!");
+    }
+
+
+
+    /* Metodo per recuperare tutti i lavoratori, chiamato da VIEW */
+    public List<Lavoratore> recuperoTuttiLavoratori(){
+
+        List<Lavoratore> lavoratoreList;
+        AssegnaProgettoDAO assegnaProgettoDAO = new AssegnaProgettoDAO();
+        lavoratoreList = assegnaProgettoDAO.recuperoTuttiLavoratori();
+
+        return lavoratoreList;
+    }
+
+
+
+    /* Metodo per visualizzare i canali privati in cui il capo non fa parte, quindi SOLO LETTURA, chiamto da switch case 10 */
+    public void visualizzaConversazionePrivata(){
+
+        CapoprogettoView capoprogettoView = new CapoprogettoView();
+
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

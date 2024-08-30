@@ -1,8 +1,8 @@
-package it.uniroma2.dicii.bd.model.dao.capoprogetto;
+package it.uniroma2.dicii.bd.dao.capoprogetto;
 
 import it.uniroma2.dicii.bd.bean.CanaleBean;
 import it.uniroma2.dicii.bd.model.Progetto;
-import it.uniroma2.dicii.bd.model.dao.ConnectionFactory;
+import it.uniroma2.dicii.bd.dao.ConnectionFactory;
 import it.uniroma2.dicii.bd.utils.Printer;
 import it.uniroma2.dicii.bd.utils.UserSession;
 

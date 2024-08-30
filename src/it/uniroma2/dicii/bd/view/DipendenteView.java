@@ -1,7 +1,9 @@
 package it.uniroma2.dicii.bd.view;
 
+import it.uniroma2.dicii.bd.controller.CapoprogettoController;
 import it.uniroma2.dicii.bd.controller.DipendenteController;
 import it.uniroma2.dicii.bd.model.Canale;
+import it.uniroma2.dicii.bd.model.Lavoratore;
 import it.uniroma2.dicii.bd.model.Messaggio;
 import it.uniroma2.dicii.bd.model.Progetto;
 import it.uniroma2.dicii.bd.utils.Printer;
@@ -15,7 +17,7 @@ import java.util.Scanner;
 
 public class DipendenteView {
 
-    public static void stampaTitolo(){
+    public static void stampaTitolo() {
         Printer.println("\n************************************");
         Printer.printlnBlu("*    Benvenuto a ChatMulticanale   *");
         Printer.println("************************************");
@@ -29,6 +31,7 @@ public class DipendenteView {
         Printer.println("2) Visualizza conversazione");   // da implementare
         Printer.println("3) Visualizza partecipazione progetti");
         Printer.println("4) Visualizza appartenenza canali");
+        Printer.println("5) Visualizza partecipanti del canale");
         Printer.println("0) Quit");
 
 
@@ -37,20 +40,18 @@ public class DipendenteView {
         while (true) {
             Printer.print("Please enter your choice: ");
             choice = input.nextInt();
-            if (choice >= 0 && choice <= 4) {  //da cambiare il valore di limite
+            if (choice >= 0 && choice <= 5) {  //da cambiare il valore di limite
                 break;
             }
-            Printer.println("Invalid option");
+            Printer.errorMessage("Invalid option");
         }
 
         return choice;
     }
 
 
-
-
     /* Metodo per ottenere scelta di utente su inserimento di messaggio, chiamato da controller */
-    public Object[] inserisciMessaggio(){
+    public Object[] inserisciMessaggio() {
 
         // Info da sapere: idProgetto, idCanale, contenutoMessaggio
         Scanner input = new Scanner(System.in);
@@ -104,10 +105,8 @@ public class DipendenteView {
 
 
         // Restituisco un array di oggetti con il contenuto del messaggio, ID del canale e ID del progetto
-        return new Object[] {contenutoMessaggio, idCanaleScelto, idProgettoScelto};
+        return new Object[]{contenutoMessaggio, idCanaleScelto, idProgettoScelto};
     }
-
-
 
 
     /* Metodo per visualizzare i messaggi di un canale scelto da utente */
@@ -161,7 +160,6 @@ public class DipendenteView {
         int tipoCanaleScelto = 0;
 
 
-
         // Trova il tipo di canale selezionato
         for (Canale canale : canaleList) {
             if (canale.getIdCanale() == idCanaleScelto) {
@@ -172,17 +170,15 @@ public class DipendenteView {
 
 
         // Restituisce un array contenente l'ID del canale, l'ID del progetto e il tipo di canale
-        return new Object[] {idCanaleScelto, idProgettoScelto, tipoCanaleScelto};
+        return new Object[]{idCanaleScelto, idProgettoScelto, tipoCanaleScelto};
 
     }
 
 
-
-
     /* Metodo per stampare le pagine di messaggi, chiamato da controller
-    * in caso di canale pubblico, viene stampato solo i messaggi pubblici
-    * in caso di canale privato (in cui utente appartiene), viene stampato solo i messaggi privati di quel canale
-    * bisogna capire come formulare stored produceres */
+     * in caso di canale pubblico, viene stampato solo i messaggi pubblici
+     * in caso di canale privato (in cui utente appartiene), viene stampato solo i messaggi privati di quel canale
+     * bisogna capire come formulare stored produceres */
     public void stampaConversazione(List<Messaggio> conversazione, int idCanale, int idProgetto, int tipoCanale) {
 
         Scanner scanner = new Scanner(System.in);
@@ -266,8 +262,6 @@ public class DipendenteView {
     }
 
 
-
-
     private int trovaIndiceMessaggioOriginale(List<Messaggio> messaggiDaVisualizzare, Messaggio messaggioOriginale) {
         for (int j = 0; j < messaggiDaVisualizzare.size(); j++) {
             Messaggio msg = messaggiDaVisualizzare.get(j);
@@ -279,7 +273,6 @@ public class DipendenteView {
         }
         return -1;
     }
-
 
 
     private void rispondiAMessaggioPubblicoPrivato(List<Messaggio> messaggiDaVisualizzare, Scanner scanner, int idCanale, int idProgetto) {
@@ -311,7 +304,6 @@ public class DipendenteView {
     }
 
 
-
     private void rispondiAMessaggioPubblico(List<Messaggio> messaggiDaVisualizzare, Scanner scanner, int idCanale, int idProgetto) {
         Printer.print("\nInserisci il numero del messaggio a cui vuoi rispondere: ");
         int numeroMessaggio = scanner.nextInt();
@@ -328,8 +320,6 @@ public class DipendenteView {
         DipendenteController dipendenteController = new DipendenteController();
         dipendenteController.rispostaPublic(messaggioOriginale, contenutoRisposta);
     }
-
-
 
 
     /* Metodo NUOVO per stampare messaggi di un canale privata:
@@ -402,7 +392,6 @@ public class DipendenteView {
     }
 
 
-
     private Messaggio recuperaMessaggioOriginale(Messaggio primoMessaggio) {
         String cfMittente = primoMessaggio.getCfUtente();
         Date dataInvio = primoMessaggio.getDataInvio();
@@ -413,22 +402,8 @@ public class DipendenteView {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /* Metodo per visualizzare i progetti a cui fa parte, chiamato da controller */
-    public void listaProgetti(){
+    public void listaProgetti() {
 
         Printer.printlnBlu("\n***** VISUALIZZA PARTECIPAZIONE PROGETTI *****");
 
@@ -453,10 +428,8 @@ public class DipendenteView {
     }
 
 
-
-
     /* Metodo per visualizzare lista di canali a cui fa parte, chiamato da controller */
-    public void listaCanali(){
+    public void listaCanali() {
         Printer.printlnBlu("\n***** VISUALIZZA APPARTENENZA CANALI *****");
 
         Printer.printlnBlu("\nLista di canali a cui fa parte: ");
@@ -479,8 +452,79 @@ public class DipendenteView {
             Printer.println("-------------------------------");
         }
 
+    }
+
+
+
+
+
+    /* Metodo per visualizzare i partecipanti di un canale scelto, chiamato da controller*/
+    public void visualizzaPartecipantiCanali() {
+
+        Printer.printlnBlu("\n***** VISUALIZZA PARTECIPANTI DEL CANALE *****");
+
+        Printer.printlnBlu("\nLista di progetti a cui fa parte: ");
+
+        // Stampo lista di progetti a cui fa parte
+        List<Progetto> progettiCandidati;
+
+        // Chiama il metodo di controller per restituire i progetti
+        progettiCandidati = DipendenteController.recuperoProgetti();
+
+        // Itera e stampa dei dettagli dei progetti con capoProgetto loggato
+        for (Progetto progetto : progettiCandidati) {
+            Printer.println("ID Progetto: " + progetto.getId());
+            Printer.println("Nome Progetto: " + progetto.getNome());
+            Printer.println("Data Inizio: " + progetto.getDataInzio());
+            Printer.println("Data Scadenza: " + progetto.getDataScadenza());
+            Printer.println("-------------------------------");
+        }
+
+        Scanner input = new Scanner(System.in);
+        Printer.print("\nInserisci l'ID del progetto in cui vuoi visualizzare i partecipanti: ");
+        int idProgettoScelto = input.nextInt();
+        input.nextLine();  // Consuma la newline
+
+        DipendenteController dipendenteController = new DipendenteController();
+
+        // Chiama il metodo di controller che restituisce tutti i canali di tale progetto
+        Printer.printlnBlu("\nLista di canali disponibili per il progetto scelto: ");
+        List<Canale> canaleList = dipendenteController.recuperoCanali(idProgettoScelto);
+
+        // Itera e stampa i canali che appartengono al id progetto scelto
+        for (Canale canale : canaleList) {
+            Printer.println("ID Canale: " + canale.getIdCanale());
+            Printer.println("Nome Canale: " + canale.getNome());
+            Printer.println("CF creatore: " + canale.getCfCreatore());
+            Printer.println("Data creazione: " + canale.getData());
+            Printer.println("Tipo di canale: " + canale.getTipo());
+            Printer.println("-------------------------------");
+        }
+
+        Printer.print("\nInserisci l'ID del canale che vuoi visualizzare i partecipanti: ");
+        int idCanaleScelto = input.nextInt();
+        input.nextLine();  // Consuma la newline
+
+        // Lista dei lavoratori che appartiene al progetto scelto
+        Printer.printlnBlu("\nLista dei lavoratori appartenenti al canale scelto: ");
+        List<Lavoratore> listLavoratori = new ArrayList<>();
+        listLavoratori = dipendenteController.recuperoLavoratoriByCanale(idCanaleScelto, idProgettoScelto);
+
+        int index = 1;
+        // Stampo la lista di lavoratori
+        for (Lavoratore lavoratore : listLavoratori) {
+            Printer.println(index + ". CF lavoratore: " + lavoratore.getCfLavoratore());
+            Printer.println("   Nome lavoratore: " + lavoratore.getNomeLavoratore());
+            Printer.println("   Cognome lavoratore: " + lavoratore.getCognomeLavoratore());
+            Printer.println("   Ruolo: " + lavoratore.getRuolo());
+            Printer.println("-------------------------------");
+            index++;
+        }
+
 
     }
+
+
 
 
 

@@ -1,7 +1,7 @@
-package it.uniroma2.dicii.bd.model.dao.amministratore;
+package it.uniroma2.dicii.bd.dao.amministratore;
 
 import it.uniroma2.dicii.bd.model.Progetto;
-import it.uniroma2.dicii.bd.model.dao.ConnectionFactory;
+import it.uniroma2.dicii.bd.dao.ConnectionFactory;
 import it.uniroma2.dicii.bd.utils.Printer;
 
 import java.sql.CallableStatement;

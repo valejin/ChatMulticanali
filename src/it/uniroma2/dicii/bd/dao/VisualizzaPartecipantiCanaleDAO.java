@@ -1,10 +1,8 @@
-package it.uniroma2.dicii.bd.model.dao.capoprogetto;
+package it.uniroma2.dicii.bd.dao;
 
 import it.uniroma2.dicii.bd.model.Lavoratore;
-import it.uniroma2.dicii.bd.model.dao.ConnectionFactory;
 import it.uniroma2.dicii.bd.model.domain.Role;
 import it.uniroma2.dicii.bd.utils.Printer;
-import it.uniroma2.dicii.bd.utils.UserSession;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -13,22 +11,23 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AssegnaCanaleDAO {
+public class VisualizzaPartecipantiCanaleDAO {
 
-    public List<Lavoratore> recuperoLavoratoriByIdProgetto(int idProgetto){
+    public List<Lavoratore> recuperoLavoratoriByCanale(int idCanale, int idProgetto){
 
         List<Lavoratore> lavoratoreList = new ArrayList<>();
         Connection conn;
         CallableStatement cs;
         ResultSet rs;
 
-        try{
+        try {
             conn = ConnectionFactory.getConnection();
 
             // Prepara la chiamata alla stored procedure
-            cs = conn.prepareCall("{call recupero_lavoratori_by_IdProgetto(?)}");
+            cs = conn.prepareCall("{call recupero_lavoratori_by_IdCanale(?,?)}");
 
-            cs.setInt(1, idProgetto);  // passo id progetto scelto da capo
+            cs.setInt(1, idCanale);  //passo id canale scelto da capo
+            cs.setInt(2, idProgetto);  // passo id progetto scelto da capo
 
             // Esegui la stored procedure
             boolean result = cs.execute();
@@ -54,46 +53,27 @@ public class AssegnaCanaleDAO {
 
                     lavoratoreList.add(lavoratore);
 
-
                 }
             }
 
-        } catch(SQLException e){
+
+        }catch(SQLException e){
             e.printStackTrace();
             Printer.errorMessage("Errore recupero lavoratore by id progetto in DAO");
         }
+
         return lavoratoreList;
-    }
-
-
-
-    /* Metodo per salvare assegnazione del canale al lavoratore */
-    public void salvaAssegnazioneCanale(Lavoratore lavoratore, int idCanale, int idProgetto){
-
-        Connection conn;
-        CallableStatement cs;
-
-        try{
-            conn = ConnectionFactory.getConnection();
-            cs = conn.prepareCall("{call assegnazione_canale(?,?,?)}");
-
-            String cflavoratore = lavoratore.getCfLavoratore();
-
-            cs.setString(1, cflavoratore);
-            cs.setInt(2, idCanale);
-            cs.setInt(3, idProgetto);
-
-            // Esegui la stored procedure
-            cs.execute();
-
-
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
-
-
 
     }
+
+
+
+
+
+
+
+
+
 
 
 

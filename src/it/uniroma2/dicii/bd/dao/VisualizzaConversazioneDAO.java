@@ -1,8 +1,7 @@
-package it.uniroma2.dicii.bd.model.dao.capoprogetto;
+package it.uniroma2.dicii.bd.dao;
 
 import it.uniroma2.dicii.bd.exception.DAOException;
 import it.uniroma2.dicii.bd.model.Messaggio;
-import it.uniroma2.dicii.bd.model.dao.ConnectionFactory;
 import it.uniroma2.dicii.bd.utils.UserSession;
 
 import java.sql.*;
@@ -173,7 +172,6 @@ public class VisualizzaConversazioneDAO {
         }
 
 
-
         try {
             conn = ConnectionFactory.getConnection();
             UserSession session = UserSession.getInstance();
@@ -203,8 +201,8 @@ public class VisualizzaConversazioneDAO {
             e.printStackTrace();
             throw new DAOException("Errore l'inserimento risposta in DAO nella tabella Risposta");
         }
-
     }
+
 
 
     /* Metodo per inserire una risposta privata in DB, creando un nuovo canale privato*/

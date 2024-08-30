@@ -1,7 +1,6 @@
-package it.uniroma2.dicii.bd.model.dao;
+package it.uniroma2.dicii.bd.dao;
 
 import it.uniroma2.dicii.bd.exception.DAOException;
-import it.uniroma2.dicii.bd.exception.LoginException;
 import it.uniroma2.dicii.bd.model.domain.Credentials;
 import it.uniroma2.dicii.bd.model.domain.Role;
 import it.uniroma2.dicii.bd.utils.Printer;

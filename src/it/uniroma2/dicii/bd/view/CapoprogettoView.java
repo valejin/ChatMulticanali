@@ -32,10 +32,15 @@ public class CapoprogettoView {
         Printer.printlnBlu("\n------- SCEGLI TRA OPERAZIONI ------");
         Printer.println("1) Crea nuovo canale");
         Printer.println("2) Inserisci messaggio");
-        Printer.println("3) Visualizza conversazione");
+        Printer.println("3) Visualizza conversazioni appartenenti");
         Printer.println("4) Assegna canale");
         Printer.println("5) Visualizza partecipazione progetti");
         Printer.println("6) Visualizza appartenenza canali");
+        Printer.println("7) Visualizza partecipanti del progetto");
+        Printer.println("8) Visualizza partecipanti del canale");
+        Printer.println("9) Assegna progetto");
+        //Printer.println("10) Visualizza conversazione privata (solo in lettura)");
+
         Printer.println("0) Quit");
 
 
@@ -44,7 +49,7 @@ public class CapoprogettoView {
         while (true) {
             Printer.print("Please enter your choice: ");
             choice = input.nextInt();
-            if (choice >= 0 && choice <= 6) {  //da cambiare il valore di limite
+            if (choice >= 0 && choice <= 9) {  //da cambiare il valore di limite
                 break;
             }
             Printer.errorMessage("Invalid option");
@@ -67,7 +72,7 @@ public class CapoprogettoView {
 
         List<Progetto> progettiCoordinati = CapoprogettoController.recuperoProgetti();
 
-        Printer.println("Lista di progetti da te coordinati: ");
+        Printer.printlnBlu("Lista di progetti da te coordinati: ");
 
         // Itera e stampa dei dettagli dei progetti con capoProgetto loggato
         for (Progetto progetto : progettiCoordinati) {
@@ -477,14 +482,6 @@ public class CapoprogettoView {
 
 
 
-
-
-
-
-
-
-
-
     /* Metodo per assegnare un canale a un lavoratore appartenente al progetto */
     public Object[] assegnaCanale(){
 
@@ -496,7 +493,7 @@ public class CapoprogettoView {
 
         List<Progetto> progettiCoordinati = capoprogettoController.recuperoProgetti();
 
-        Printer.println("\nLista di progetti da te coordinati: ");
+        Printer.printlnBlu("\nLista di progetti da te coordinati: ");
 
         // Itera e stampa dei dettagli dei progetti con capoProgetto loggato
         for (Progetto progetto : progettiCoordinati) {
@@ -531,7 +528,7 @@ public class CapoprogettoView {
         input.nextLine();  // Consuma la newline
 
         // Lista dei lavoratori che appartiene al progetto scelto
-        Printer.println("\nLista dei lavoratori appartenenti al progetto scelto: ");
+        Printer.printlnBlu("\nLista dei lavoratori appartenenti al progetto scelto: ");
         List<Lavoratore> lavoratoreList = capoprogettoController.recuperoLavoratori(idProgettoScelto);
 
 
@@ -617,10 +614,201 @@ public class CapoprogettoView {
             Printer.println("Tipo di canale: " + canale.getTipo());
             Printer.println("-------------------------------");
         }
+    }
 
+
+
+
+    /* Metodo per visualizzare i partecipanti di un progetto */
+    public void visualizzaPartecipantiProgetto(){
+        Printer.printlnBlu("\n***** VISUALIZZA PARTECIPANTI DEL PROGETTO *****");
+
+        Printer.printlnBlu("\nLista di progetti a cui fa parte: ");
+
+        // Stampo lista di progetti a cui fa parte
+        List<Progetto> progettiCandidati;
+
+        // Chiama il metodo di controller per restituire i progetti
+        progettiCandidati = CapoprogettoController.recuperoProgetti();
+
+        // Itera e stampa dei dettagli dei progetti con capoProgetto loggato
+        for (Progetto progetto : progettiCandidati) {
+            Printer.println("ID Progetto: " + progetto.getId());
+            Printer.println("Nome Progetto: " + progetto.getNome());
+            Printer.println("Data Inizio: " + progetto.getDataInzio());
+            Printer.println("Data Scadenza: " + progetto.getDataScadenza());
+            Printer.println("-------------------------------");
+        }
+
+        Scanner input = new Scanner(System.in);
+        Printer.print("\nInserisci l'ID del progetto in cui vuoi visualizzare i partecipanti: ");
+        int idProgettoScelto = input.nextInt();
+        input.nextLine();  // Consuma la newline
+
+
+        // Lista dei lavoratori che appartiene al progetto scelto
+        Printer.printlnBlu("\nLista dei lavoratori appartenenti al progetto scelto: ");
+        List<Lavoratore> lavoratoreList = CapoprogettoController.recuperoLavoratori(idProgettoScelto);
+
+        int index = 1;
+        // Stampo la lista di lavoratori
+        for (Lavoratore lavoratore : lavoratoreList) {
+            Printer.println(index + ". CF lavoratore: " + lavoratore.getCfLavoratore());
+            Printer.println("   Nome lavoratore: " + lavoratore.getNomeLavoratore());
+            Printer.println("   Cognome lavoratore: " + lavoratore.getCognomeLavoratore());
+            Printer.println("   Ruolo: " + lavoratore.getRuolo());
+            Printer.println("-------------------------------");
+            index++;
+        }
+    }
+
+
+
+
+    /* Metodo per visualizzare i partecipanti di un canale scelto, chiamato da controller*/
+    public void visualizzaPartecipantiCanali(){
+
+        Printer.printlnBlu("\n***** VISUALIZZA PARTECIPANTI DEL CANALE *****");
+
+        Printer.printlnBlu("\nLista di progetti a cui fa parte: ");
+
+        // Stampo lista di progetti a cui fa parte
+        List<Progetto> progettiCandidati;
+
+        // Chiama il metodo di controller per restituire i progetti
+        progettiCandidati = CapoprogettoController.recuperoProgetti();
+
+        // Itera e stampa dei dettagli dei progetti con capoProgetto loggato
+        for (Progetto progetto : progettiCandidati) {
+            Printer.println("ID Progetto: " + progetto.getId());
+            Printer.println("Nome Progetto: " + progetto.getNome());
+            Printer.println("Data Inizio: " + progetto.getDataInzio());
+            Printer.println("Data Scadenza: " + progetto.getDataScadenza());
+            Printer.println("-------------------------------");
+        }
+
+        Scanner input = new Scanner(System.in);
+        Printer.print("\nInserisci l'ID del progetto in cui vuoi visualizzare i partecipanti: ");
+        int idProgettoScelto = input.nextInt();
+        input.nextLine();  // Consuma la newline
+
+        CapoprogettoController capoprogettoController = new CapoprogettoController();
+
+        // Chiama il metodo di controller che restituisce tutti i canali di tale progetto
+        Printer.printlnBlu("\nLista di canali disponibili per il progetto scelto: ");
+        List<Canale> canaleList = capoprogettoController.recuperoCanali(idProgettoScelto);
+
+        // Itera e stampa i canali che appartengono al id progetto scelto
+        for (Canale canale : canaleList) {
+            Printer.println("ID Canale: " + canale.getIdCanale());
+            Printer.println("Nome Canale: " + canale.getNome());
+            Printer.println("CF creatore: " + canale.getCfCreatore());
+            Printer.println("Data creazione: " + canale.getData());
+            Printer.println("Tipo di canale: " + canale.getTipo());
+            Printer.println("-------------------------------");
+        }
+
+        Printer.print("\nInserisci l'ID del canale che vuoi visualizzare i partecipanti: ");
+        int idCanaleScelto = input.nextInt();
+        input.nextLine();  // Consuma la newline
+
+        // Lista dei lavoratori che appartiene al progetto scelto
+        Printer.printlnBlu("\nLista dei lavoratori appartenenti al canale scelto: ");
+        List<Lavoratore> listLavoratori = new ArrayList<>();
+        listLavoratori = capoprogettoController.recuperoLavoratoriByCanale(idCanaleScelto,idProgettoScelto);
+
+        int index = 1;
+        // Stampo la lista di lavoratori
+        for (Lavoratore lavoratore : listLavoratori) {
+            Printer.println(index + ". CF lavoratore: " + lavoratore.getCfLavoratore());
+            Printer.println("   Nome lavoratore: " + lavoratore.getNomeLavoratore());
+            Printer.println("   Cognome lavoratore: " + lavoratore.getCognomeLavoratore());
+            Printer.println("   Ruolo: " + lavoratore.getRuolo());
+            Printer.println("-------------------------------");
+            index++;
+        }
 
     }
 
+
+
+
+    /* Metodo per assegnare il progetto a un lavoratore, chiamato da Controller */
+    public Object[] assegnaProgetto(){
+
+        CapoprogettoController capoprogettoController = new CapoprogettoController();
+        Printer.printlnBlu("\n***** ASSEGNAZIONE PROGETTO *****");
+
+        Printer.printlnBlu("\nLista di progetti a cui fa parte: ");
+
+        // Stampo lista di progetti a cui fa parte
+        List<Progetto> progettiCandidati;
+
+        // Chiama il metodo di controller per restituire i progetti
+        progettiCandidati = CapoprogettoController.recuperoProgetti();
+
+        // Itera e stampa dei dettagli dei progetti con capoProgetto loggato
+        for (Progetto progetto : progettiCandidati) {
+            Printer.println("ID Progetto: " + progetto.getId());
+            Printer.println("Nome Progetto: " + progetto.getNome());
+            Printer.println("Data Inizio: " + progetto.getDataInzio());
+            Printer.println("Data Scadenza: " + progetto.getDataScadenza());
+            Printer.println("-------------------------------");
+        }
+
+        Scanner input = new Scanner(System.in);
+        Printer.print("\nInserisci l'ID del progetto in cui vuoi assegnare: ");
+        int idProgettoScelto = input.nextInt();
+        input.nextLine();  // Consuma la newline
+
+
+        // Lista dei lavoratori in azienda
+        Printer.printlnBlu("\nLista dei lavoratori: ");
+
+        //devo recuperare la lista dei lavoratori
+        // poi sceglie
+        // poi assegnare il progetto a lui
+        List<Lavoratore> tuttiLavoratori = capoprogettoController.recuperoTuttiLavoratori();
+
+        int index = 1;
+        // Stampo la lista di lavoratori
+        for (Lavoratore lavoratore : tuttiLavoratori) {
+            Printer.println(index + ". CF lavoratore: " + lavoratore.getCfLavoratore());
+            Printer.println("   Nome lavoratore: " + lavoratore.getNomeLavoratore());
+            Printer.println("   Cognome lavoratore: " + lavoratore.getCognomeLavoratore());
+            Printer.println("   Ruolo: " + lavoratore.getRuolo());
+            Printer.println("-------------------------------");
+            index++;
+        }
+
+        // Chiedi all'utente di scegliere il lavoratore per numero
+        Printer.print("\nInserisci il numero del lavoratore che vuoi assegnare il progetto: ");
+        int lavoratoreSceltoIndex = input.nextInt();
+        input.nextLine();  // Consuma la newline
+
+        Lavoratore lavoratoreScelto = new Lavoratore();
+
+        // Recupera il lavoratore selezionato dalla lista usando l'indice
+        if (lavoratoreSceltoIndex > 0 && lavoratoreSceltoIndex <= tuttiLavoratori.size()) {
+            lavoratoreScelto = tuttiLavoratori.get(lavoratoreSceltoIndex - 1);
+        }else {
+            Printer.println("Numero del lavoratore non valido. Operazione annullata.");
+        }
+
+        return new Object[] {lavoratoreScelto, idProgettoScelto};
+
+    }
+
+
+
+    /* Metodo per visualizzare canali privati degli altri (SOLO LETTURA) */
+    public void visualizzaConversazionePrivata(){
+
+
+
+
+
+    }
 
 
 
