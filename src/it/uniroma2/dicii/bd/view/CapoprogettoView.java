@@ -245,7 +245,7 @@ public class CapoprogettoView {
 
 
 
-    /* RISPOSTA PRIVATA DA RIVEDERE: Metodo per stampare le pagine di messaggi, chiamato da controller */
+    /* Metodo per stampare le pagine di messaggi di un canale pubblico, chiamato da controller */
     public void stampaConversazione(List<Messaggio> conversazione, int idCanale, int idProgetto, int tipoCanale) {
         /* I messaggi sono organizzati in pagine e i capi progetto e dipendenti possono visualizzare,
         una per una, le pagine della conversazione.*/
@@ -265,15 +265,6 @@ public class CapoprogettoView {
         } else if (tipoCanale == 2) {  // Canale privato
             messaggiDaVisualizzare.addAll(conversazione);
         }
-
-
-        // qui devo mettere una funzione che recupera il primo messaggio originale che utente risponde privatamente
-        // chiama controller, che chiama DAO per recuperare Contenuto di messaggio originale
-
-        // forse conviene fare un metodo a parte per stampaConversazionePrivata, chiamato da controller
-
-
-
 
 
         int numeroPagine = (int) Math.ceil((double) messaggiDaVisualizzare.size() / messaggiPerPagina);
@@ -377,11 +368,11 @@ public class CapoprogettoView {
 
 
 
-    /* Metodo NUOVO per stampare messaggi di canale privata:
-    * - proviamo se il messaggio originale di riferimento può essere stampato
+    /* Metodo NUOVO per stampare messaggi di un canale privata:
     * - il messaggio originario: è il quale l'utente ha risposto in modo privato e viene creato un canale privato */
 
-    public void stampaConversazionePrivata(List<Messaggio> conversazione, int idCanale, int idProgetto, int tipoCanale) {
+
+    public void stampaConversazionePrivata(List<Messaggio> conversazione, int idCanale, int idProgetto) {
         /* I messaggi sono organizzati in pagine e i capi progetto e dipendenti possono visualizzare,
         una per una, le pagine della conversazione.*/
 
@@ -390,17 +381,8 @@ public class CapoprogettoView {
         List<Messaggio> messaggiDaVisualizzare = new ArrayList<>();
 
 
-        // Filtra i messaggi in base al tipo di canale -> PUò ESSERE ELIMINATO
-        if (tipoCanale == 1) {  // Canale pubblico
-            for (Messaggio messaggio : conversazione) {
-                if (messaggio.getIsVisible() == null || messaggio.getIsVisible() == 0) {
-                    messaggiDaVisualizzare.add(messaggio);
-                }
-            }
-        } else if (tipoCanale == 2) {  // Canale privato
-            messaggiDaVisualizzare.addAll(conversazione);
-        }
-
+        // Aggiungi tutti i messaggi della conversazione alla lista messaggiDaVisualizzare
+        messaggiDaVisualizzare.addAll(conversazione);
 
 
         // Estrai il primo messaggio dalla lista
