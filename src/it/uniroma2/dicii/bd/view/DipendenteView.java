@@ -97,7 +97,7 @@ public class DipendenteView {
         input.nextLine();  // Consuma la newline
 
         // Raccolgo il contenuto del messaggio
-        Printer.println("\nInserisci il messaggio (Permere INVIO per confermare l'invio di messaggio): ");
+        Printer.println("\nInserisci il messaggio (Premere INVIO per confermare l'invio di messaggio): ");
         String contenutoMessaggio = input.nextLine();
 
 
@@ -177,12 +177,30 @@ public class DipendenteView {
 
 
 
-    /* Metodo per stampare le pagine di messaggi, chiamato da controller */
+    /* Metodo per stampare le pagine di messaggi, chiamato da controller
+    * in caso di canale pubblico, viene stampato solo i messaggi pubblici
+    * in caso di canale privato (in cui utente appartiene), viene stampato solo i messaggi privati di quel canale
+    * bisogna capire come formulare stored produceres */
     public void stampaConversazione(List<Messaggio> conversazione, int idCanale, int idProgetto, int tipoCanale) {
 
         // quando stampo devo considerare per i canali pubblici solo i messaggi pubblici
         // per i canali privati, posso stampare solo i messaggi di quel canale, con il messaggio originario
 
+
+        Scanner scanner = new Scanner(System.in);
+        int messaggiPerPagina = 5;  // Numero di messaggi per pagina
+        List<Messaggio> messaggiDaVisualizzare = new ArrayList<>();
+
+        // Filtra i messaggi in base al tipo di canale
+        if (tipoCanale == 1) {  // Canale pubblico
+            for (Messaggio messaggio : conversazione) {
+                if (messaggio.getIsVisible() == null || messaggio.getIsVisible() == 0) {
+                    messaggiDaVisualizzare.add(messaggio);
+                }
+            }
+        } else if (tipoCanale == 2) {  // Canale privato
+            messaggiDaVisualizzare.addAll(conversazione);
+        }
 
 
 

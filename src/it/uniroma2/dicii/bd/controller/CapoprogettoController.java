@@ -17,7 +17,9 @@ import it.uniroma2.dicii.bd.utils.Printer;
 import it.uniroma2.dicii.bd.view.CapoprogettoView;
 
 import java.io.IOException;
+import java.sql.Date;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.util.List;
 
 public class CapoprogettoController implements Controller{
@@ -146,7 +148,7 @@ public class CapoprogettoController implements Controller{
         // Viene restituito ID progetto e ID canale
         int idCanaleScelto = (int) infoCanale[0];
         int idProgettoScelto = (int) infoCanale[1];
-        int tipoCanaleScelto = (int) infoCanale[2];
+        int tipoCanaleScelto = (int) infoCanale[2];  // indica se il canale scelto è pubblico o privato
 
 
         // Chiamo DAO per recuperare i messaggi del canale scelto, poi li restituisco a VIEW per stampare all'utente
@@ -158,9 +160,36 @@ public class CapoprogettoController implements Controller{
         }
         // RICORDA: i messaggi vengono stampati come le pagine
 
-        capoprogettoView.stampaConversazione(conversazioni, idCanaleScelto, idProgettoScelto, tipoCanaleScelto);
+        if(tipoCanaleScelto==1) {
+            capoprogettoView.stampaConversazione(conversazioni, idCanaleScelto, idProgettoScelto, tipoCanaleScelto);
+        }else{
+            capoprogettoView.stampaConversazionePrivata(conversazioni,idCanaleScelto,idProgettoScelto, tipoCanaleScelto);
+        }
+    }
+
+
+
+
+    /* Metodo per recuperare il messaggio originario di una risposta privata, chiamato da VIEW */
+    public Messaggio recuperoMessaggioOriginario(String cfRispondente, Date dataInvioRispondente, Time orarioInvioRispondente){
+
+        Messaggio messaggioOriginale = new Messaggio();  //per contenere il messaggio originale
+
+        VisualizzaConversazioneDAO visualizzaConversazioneDAO = new VisualizzaConversazioneDAO();
+        try{
+            // qui viene passato: cfRispondente, dataInvioRispondente, orarioInvioRispondente
+            messaggioOriginale = visualizzaConversazioneDAO.recuperoMessaggioOriginale(cfRispondente, dataInvioRispondente, orarioInvioRispondente);
+
+        } catch(DAOException e){
+            e.printStackTrace();
+        }
+
+        return messaggioOriginale;
 
     }
+
+
+
 
 
     /* Metodo per salvare la risposta di utente (in modo pubblico) in DB, chiamato da VIEW */
@@ -170,7 +199,7 @@ public class CapoprogettoController implements Controller{
             // Nel messaggio originario contiene già idCanale e idProgetto
             // Il messaggio in DB viene identificato da CFMittente, DataInvio e OrarioInvio
             VisualizzaConversazioneDAO.inserisciRisposta(messaggioOriginale, contenutoRisposta, 0);
-            Printer.println("Risposta pubblica inviata con successo.");
+            Printer.printlnViola("Risposta pubblica inviata con successo.");
 
 
         } catch (DAOException e) {
@@ -196,7 +225,7 @@ public class CapoprogettoController implements Controller{
 
 
 
-    /* NUOVO METODO, DA PROVARE: Metodo per memorizzare la risposta privata in DB */
+    /* NUOVO METODO FUNZIONANTE: Metodo per memorizzare la risposta privata in DB */
     public void memorizzaRispostaPrivata(Messaggio messaggioOriginale, String contenutoRisposta){
 
         try {

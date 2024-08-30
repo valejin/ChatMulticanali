@@ -78,6 +78,63 @@ public class VisualizzaConversazioneDAO {
 
 
 
+
+    /* Metodo per recuperare il messaggio originario da DB a partire da cfRispondente,
+    dataInvioRispondente, orarioInvioRispondente */
+    public Messaggio recuperoMessaggioOriginale(String cfRispondente, Date dataInvioRispondente, Time orarioInvioRispondente) throws DAOException{
+
+        Connection conn;
+        CallableStatement cs;
+        ResultSet rs;
+        Messaggio messaggioOriginario = new Messaggio();
+
+        try{
+            conn = ConnectionFactory.getConnection();
+
+            // Prepara la chiamata alla stored procedure
+            cs = conn.prepareCall("{call recupero_messaggio_originario(?,?,?)}");
+
+            // Mettere id canale e id progetto
+            cs.setString(1, cfRispondente);
+            cs.setDate(2, dataInvioRispondente);
+            cs.setTime(3, orarioInvioRispondente);
+
+            // Esegui la stored procedure
+            boolean result = cs.execute();
+
+            // Se c'è un result set
+            if (result) {
+                rs = cs.getResultSet();
+
+                rs.next();
+                // popolo il messaggio originale
+                messaggioOriginario.setCfUtente(rs.getString("Mittente_CF"));
+                messaggioOriginario.setDataInvio(rs.getDate("DataInvioMittente"));
+                messaggioOriginario.setOrarioInvio(rs.getTime("OrarioInvioMittente"));
+                messaggioOriginario.setContenuto(rs.getString("Contenuto"));  //messaggio originario
+                messaggioOriginario.setNomeUtente(rs.getString("Nome"));
+                messaggioOriginario.setCognomeUtente(rs.getString("Cognome"));
+
+            }
+
+
+
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+
+        return messaggioOriginario;
+
+    }
+
+
+
+
+
+
+
+
+
     /* Metodo per memorizzare i dati della risposta di utente relativa a un messaggio in tabella risposta
     * e salvare la risposta come un messaggio */
     public static void inserisciRisposta(Messaggio messaggioOriginale, String contenutoRisposta, int visible) throws DAOException{
@@ -166,7 +223,7 @@ public class VisualizzaConversazioneDAO {
             UserSession session = UserSession.getInstance();
 
             // Prepara la chiamata alla stored procedure
-            cs = conn.prepareCall("{call inserisci_risposta_privata(?,?,?,?,?,?,?,?,?)}");
+            cs = conn.prepareCall("{call inserisci_risposta_privata(?,?,?,?,?,?,?,?,?,?)}");
 
             //in tabella Risposta: mittenteCF, dataInvioM, orarioInvioM, visibilità, rispondenteCF, dataInvioR, orarioInvioR
             //in messaggio: CFmittente, dataInvio, orarioInvio, contenuto, idCanale, id Progetto
@@ -183,6 +240,7 @@ public class VisualizzaConversazioneDAO {
             cs.setString(7, messaggioOriginale.getCfUtente());  //CF mittente messaggio originario
             cs.setDate(8, messaggioOriginale.getDataInvio());  //dataInvio messaggio originario
             cs.setTime(9, messaggioOriginale.getOrarioInvio());  //orarioInvio messaggio originario
+            cs.setString(10, messaggioOriginale.getContenuto());  //contenuto messaggio originario
             // visibilità verrà settato in SQL
 
             // Esegui la stored procedure

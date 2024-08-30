@@ -120,7 +120,7 @@ public class DipendenteController implements Controller{
         int tipoCanaleScelto = (int) infoCanale[2];
 
 
-        // Chiamo DAO per recuperare i messaggi del canale scelto, poi li restituisco a VIEW per stampare all'utente
+        // Chiama DAO per recuperare i messaggi del canale scelto, poi li restituisco a VIEW per stampare all'utente
         VisualizzaConversazioneDAO visualizzaConversazioneDAO = new VisualizzaConversazioneDAO();
 
 
