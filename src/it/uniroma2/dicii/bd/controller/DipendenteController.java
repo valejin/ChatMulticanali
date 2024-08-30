@@ -14,7 +14,9 @@ import it.uniroma2.dicii.bd.utils.Printer;
 import it.uniroma2.dicii.bd.view.DipendenteView;
 
 import java.io.IOException;
+import java.sql.Date;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.util.List;
 
 public class DipendenteController implements Controller{
@@ -41,7 +43,7 @@ public class DipendenteController implements Controller{
 
             switch(choice) {
                 case 1 -> inserisciNuovoMessaggio();
-                //case 2 -> visualizzaConversazione();    // da implementare
+                case 2 -> visualizzaConversazione();    // da implementare
                 case 3 -> visualizzaAppartenenzaProgetti();
                 case 4 -> visualizzaAppartenenzaCanali();
                 case 0 -> System.exit(0);
@@ -131,12 +133,80 @@ public class DipendenteController implements Controller{
         }
 
 
-        // RICORDA: i messaggi vengono stampati come le pagine
-
-        //dipendenteView.stampaConversazione(conversazioni, idCanaleScelto, idProgettoScelto, tipoCanaleScelto);
-
+        if(tipoCanaleScelto==1) {
+            dipendenteView.stampaConversazione(conversazioni, idCanaleScelto, idProgettoScelto, tipoCanaleScelto);
+        }else{
+            dipendenteView.stampaConversazionePrivata(conversazioni,idCanaleScelto,idProgettoScelto);
+        }
 
     }
+
+
+
+
+
+    /* Metodo per salvare la risposta di utente (in modo pubblico) in DB, chiamato da VIEW */
+    public void rispostaPublic(Messaggio messaggioOriginale, String contenutoRisposta){
+
+        try {
+            // Nel messaggio originario contiene già idCanale e idProgetto
+            // Il messaggio in DB viene identificato da CFMittente, DataInvio e OrarioInvio
+            VisualizzaConversazioneDAO.inserisciRisposta(messaggioOriginale, contenutoRisposta, 0);
+            Printer.printlnViola("Risposta pubblica inviata con successo.");
+
+
+        } catch (DAOException e) {
+            Printer.errorMessage("Errore durante l'invio della risposta pubblica.");
+        }
+
+    }
+
+
+
+
+    /* NUOVO METODO FUNZIONANTE: Metodo per memorizzare la risposta privata in DB */
+    public void memorizzaRispostaPrivata(Messaggio messaggioOriginale, String contenutoRisposta){
+
+        try {
+            VisualizzaConversazioneDAO visualizzaConversazioneDAO = new VisualizzaConversazioneDAO();
+            visualizzaConversazioneDAO.inserisciRispostaPrivata(messaggioOriginale, contenutoRisposta);
+        } catch(DAOException e){
+            Printer.errorMessage("Errore inserimento risposta privata in DB con nuovo metodo");
+            e.printStackTrace();
+        }
+
+    }
+
+
+
+
+    /* Metodo per recuperare il messaggio originario di una risposta privata, chiamato da VIEW */
+    public Messaggio recuperoMessaggioOriginario(String cfRispondente, Date dataInvioRispondente, Time orarioInvioRispondente){
+
+        Messaggio messaggioOriginale = new Messaggio();  //per contenere il messaggio originale
+
+        VisualizzaConversazioneDAO visualizzaConversazioneDAO = new VisualizzaConversazioneDAO();
+        try{
+            // qui viene passato: cfRispondente, dataInvioRispondente, orarioInvioRispondente
+            messaggioOriginale = visualizzaConversazioneDAO.recuperoMessaggioOriginale(cfRispondente, dataInvioRispondente, orarioInvioRispondente);
+
+        } catch(DAOException e){
+            e.printStackTrace();
+        }
+
+        return messaggioOriginale;
+
+    }
+
+
+
+
+
+
+
+
+
+
 
 
 

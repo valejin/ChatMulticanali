@@ -69,7 +69,7 @@ public class CapoprogettoView {
 
         Printer.println("Lista di progetti da te coordinati: ");
 
-        // Itera e stampa dei dettagli dei progetti con capoprogetto loggato
+        // Itera e stampa dei dettagli dei progetti con capoProgetto loggato
         for (Progetto progetto : progettiCoordinati) {
             Printer.println("ID Progetto: " + progetto.getId());
             Printer.println("Nome Progetto: " + progetto.getNome());
@@ -102,7 +102,7 @@ public class CapoprogettoView {
         canaleBean.setNome(nomeCanale);
         canaleBean.setCfCreatore(cfCapo);
         canaleBean.setData(giornoCreazione);
-        canaleBean.setTipoById(1);  //publico
+        canaleBean.setTipoById(1);  //pubblico
 
         return canaleBean;
     }
@@ -128,7 +128,7 @@ public class CapoprogettoView {
         // Chiama il metodo di controller per restituire i progetti
         progettiCandidati = capoprogettoController.recuperoProgetti();
 
-        // Itera e stampa dei dettagli dei progetti con capoprogetto loggato
+        // Itera e stampa dei dettagli dei progetti con capoProgetto loggato
         for (Progetto progetto : progettiCandidati) {
             Printer.println("ID Progetto: " + progetto.getId());
             Printer.println("Nome Progetto: " + progetto.getNome());
@@ -162,7 +162,7 @@ public class CapoprogettoView {
         input.nextLine();  // Consuma la newline
 
         // Raccolgo il contenuto del messaggio
-        Printer.println("\nInserisci il messaggio (Permere INVIO per confermare l'invio di messaggio): ");
+        Printer.println("\nInserisci il messaggio (Premere INVIO per confermare l'invio di messaggio): ");
         String contenutoMessaggio = input.nextLine();
 
 
@@ -193,7 +193,7 @@ public class CapoprogettoView {
         // Chiama il metodo di controller per restituire i progetti
         progettiCandidati = capoprogettoController.recuperoProgetti();
 
-        // Itera e stampa dei dettagli dei progetti con capoprogetto loggato
+        // Itera e stampa dei dettagli dei progetti con capoProgetto loggato
         for (Progetto progetto : progettiCandidati) {
             Printer.println("ID Progetto: " + progetto.getId());
             Printer.println("Nome Progetto: " + progetto.getNome());
@@ -396,11 +396,11 @@ public class CapoprogettoView {
         una per una, le pagine della conversazione.*/
 
         // Estrai il primo messaggio dalla lista e recupera il messaggio originale
-        Messaggio primoMessaggio = messaggiDaVisualizzare.get(0);
+        Messaggio primoMessaggio = messaggiDaVisualizzare.getFirst();
         Messaggio messaggioOriginario = recuperaMessaggioOriginale(primoMessaggio);
 
         // Aggiungi il messaggio originario all'inizio della lista
-        messaggiDaVisualizzare.add(0, messaggioOriginario);
+        messaggiDaVisualizzare.addFirst(messaggioOriginario);
 
         int numeroPagine = (int) Math.ceil((double) messaggiDaVisualizzare.size() / messaggiPerPagina);
         int paginaCorrente = 0;
@@ -498,7 +498,7 @@ public class CapoprogettoView {
 
         Printer.println("\nLista di progetti da te coordinati: ");
 
-        // Itera e stampa dei dettagli dei progetti con capoprogetto loggato
+        // Itera e stampa dei dettagli dei progetti con capoProgetto loggato
         for (Progetto progetto : progettiCoordinati) {
             Printer.println("ID Progetto: " + progetto.getId());
             Printer.println("Nome Progetto: " + progetto.getNome());
@@ -580,7 +580,7 @@ public class CapoprogettoView {
         // Chiama il metodo di controller per restituire i progetti
         progettiCandidati = CapoprogettoController.recuperoProgetti();
 
-        // Itera e stampa dei dettagli dei progetti con capoprogetto loggato
+        // Itera e stampa dei dettagli dei progetti con capoProgetto loggato
         for (Progetto progetto : progettiCandidati) {
             Printer.println("ID Progetto: " + progetto.getId());
             Printer.println("Nome Progetto: " + progetto.getNome());

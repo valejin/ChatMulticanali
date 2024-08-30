@@ -158,7 +158,6 @@ public class CapoprogettoController implements Controller{
         } catch(DAOException e){
             Printer.errorMessage("Errore Visualizzazione Conversazione Controller");
         }
-        // RICORDA: i messaggi vengono stampati come le pagine
 
         if(tipoCanaleScelto==1) {
             capoprogettoView.stampaConversazione(conversazioni, idCanaleScelto, idProgettoScelto, tipoCanaleScelto);

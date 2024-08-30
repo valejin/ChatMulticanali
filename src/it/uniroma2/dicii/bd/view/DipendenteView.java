@@ -7,6 +7,8 @@ import it.uniroma2.dicii.bd.model.Progetto;
 import it.uniroma2.dicii.bd.utils.Printer;
 
 import java.io.IOException;
+import java.sql.Date;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -183,13 +185,12 @@ public class DipendenteView {
     * bisogna capire come formulare stored produceres */
     public void stampaConversazione(List<Messaggio> conversazione, int idCanale, int idProgetto, int tipoCanale) {
 
-        // quando stampo devo considerare per i canali pubblici solo i messaggi pubblici
-        // per i canali privati, posso stampare solo i messaggi di quel canale, con il messaggio originario
-
-
         Scanner scanner = new Scanner(System.in);
         int messaggiPerPagina = 5;  // Numero di messaggi per pagina
         List<Messaggio> messaggiDaVisualizzare = new ArrayList<>();
+
+        /* I messaggi sono organizzati in pagine e i capi progetto e dipendenti possono visualizzare,
+        una per una, le pagine della conversazione.*/
 
         // Filtra i messaggi in base al tipo di canale
         if (tipoCanale == 1) {  // Canale pubblico
@@ -202,9 +203,225 @@ public class DipendenteView {
             messaggiDaVisualizzare.addAll(conversazione);
         }
 
+        int numeroPagine = (int) Math.ceil((double) messaggiDaVisualizzare.size() / messaggiPerPagina);
+        int paginaCorrente = 0;
+
+        while (true) {
+            // Calcola l'indice di inizio e fine per la pagina corrente
+            int start = paginaCorrente * messaggiPerPagina;
+            int end = Math.min(start + messaggiPerPagina, messaggiDaVisualizzare.size());
+
+            Printer.printlnBlu("\n***** DETTAGLI CONVERSAZIONE - PAGINA " + (paginaCorrente + 1) + " di " + numeroPagine + " *****");
+
+            // Stampa i messaggi per la pagina corrente con numerazione
+            for (int i = start; i < end; i++) {
+                Messaggio messaggio = messaggiDaVisualizzare.get(i);
+                int numeroMessaggio = i + 1;  // Numero univoco del messaggio
+
+                if (messaggio.isRisposta()) {
+                    // Cerca l'indice del messaggio originale
+                    Messaggio messaggioOriginale = messaggio.getMessaggioOriginale();
+                    int numeroMessaggioOriginale = trovaIndiceMessaggioOriginale(messaggiDaVisualizzare, messaggioOriginale);
+
+                    if (numeroMessaggioOriginale != -1) {
+                        Printer.printlnViola("Risposta al Messaggio #" + numeroMessaggioOriginale);
+                    } else {
+                        Printer.println("Risposta a un messaggio non trovato.");
+                    }
+                }
+
+                Printer.println("Messaggio #" + numeroMessaggio);
+                Printer.print("Nome: " + messaggio.getNomeUtente() + "   ");
+                Printer.println("Cognome: " + messaggio.getCognomeUtente());
+                Printer.print("Data Invio: " + messaggio.getDataInvio() + "   ");
+                Printer.println("Orario Invio: " + messaggio.getOrarioInvio());
+                Printer.println("Contenuto: " + messaggio.getContenuto());
+                Printer.println("-------------------------------");
+            }
 
 
+            // Chiedi all'utente cosa fare
+            Printer.println("\n[1] Pagina precedente | [2] Pagina successiva | [3] Rispondi | [0] Esci");
+            int scelta = scanner.nextInt();
+
+            if (scelta == 1 && paginaCorrente > 0) {
+                paginaCorrente--;  // Vai alla pagina precedente
+            } else if (scelta == 2 && paginaCorrente < numeroPagine - 1) {
+                paginaCorrente++;  // Vai alla pagina successiva
+            } else if (scelta == 3) {
+                if (tipoCanale == 1) {
+                    rispondiAMessaggioPubblicoPrivato(messaggiDaVisualizzare, scanner, idCanale, idProgetto);
+                    break;
+                } else if (tipoCanale == 2) {
+                    rispondiAMessaggioPubblico(messaggiDaVisualizzare, scanner, idCanale, idProgetto);
+                    break;
+                }
+            } else if (scelta == 0) {
+                break;  // Esci dalla visualizzazione
+            } else {
+                Printer.errorMessage("Scelta non valida, riprova.");
+            }
+
+        }
     }
+
+
+
+
+    private int trovaIndiceMessaggioOriginale(List<Messaggio> messaggiDaVisualizzare, Messaggio messaggioOriginale) {
+        for (int j = 0; j < messaggiDaVisualizzare.size(); j++) {
+            Messaggio msg = messaggiDaVisualizzare.get(j);
+            if (msg.getCfUtente().equals(messaggioOriginale.getCfUtente())
+                    && msg.getDataInvio().equals(messaggioOriginale.getDataInvio())
+                    && msg.getOrarioInvio().equals(messaggioOriginale.getOrarioInvio())) {
+                return j + 1; // Indice del messaggio originale (inizia da 1)
+            }
+        }
+        return -1;
+    }
+
+
+
+    private void rispondiAMessaggioPubblicoPrivato(List<Messaggio> messaggiDaVisualizzare, Scanner scanner, int idCanale, int idProgetto) {
+        Printer.print("\nInserisci il numero del messaggio a cui vuoi rispondere: ");
+        int numeroMessaggio = scanner.nextInt();
+        scanner.nextLine();
+
+        Messaggio messaggioOriginale = messaggiDaVisualizzare.get(numeroMessaggio - 1);
+        messaggioOriginale.setIdCanale(idCanale);
+        messaggioOriginale.setIdProgetto(idProgetto);
+
+        Printer.println("\nVuoi rispondere in [1] Pubblico o [2] Privato?");
+        int sceltaRisposta = scanner.nextInt();
+        scanner.nextLine();
+
+        DipendenteController dipendenteController = new DipendenteController();
+
+        if (sceltaRisposta == 1) {
+            // Risposta pubblica
+            Printer.print("Inserisci la risposta: ");
+            String contenutoRisposta = scanner.nextLine();
+            dipendenteController.rispostaPublic(messaggioOriginale, contenutoRisposta);
+        } else if (sceltaRisposta == 2) {
+            // Risposta privata
+            Printer.print("Inserisci il tuo messaggio privato: ");
+            String contenutoRispostaPrivata = scanner.nextLine();
+            dipendenteController.memorizzaRispostaPrivata(messaggioOriginale, contenutoRispostaPrivata);
+        }
+    }
+
+
+
+    private void rispondiAMessaggioPubblico(List<Messaggio> messaggiDaVisualizzare, Scanner scanner, int idCanale, int idProgetto) {
+        Printer.print("\nInserisci il numero del messaggio a cui vuoi rispondere: ");
+        int numeroMessaggio = scanner.nextInt();
+        scanner.nextLine();
+
+        Messaggio messaggioOriginale = messaggiDaVisualizzare.get(numeroMessaggio - 1);
+        messaggioOriginale.setIdCanale(idCanale);
+        messaggioOriginale.setIdProgetto(idProgetto);
+
+        // Risposta pubblica automatica
+        Printer.print("Inserisci la risposta: ");
+        String contenutoRisposta = scanner.nextLine();
+
+        DipendenteController dipendenteController = new DipendenteController();
+        dipendenteController.rispostaPublic(messaggioOriginale, contenutoRisposta);
+    }
+
+
+
+
+    /* Metodo NUOVO per stampare messaggi di un canale privata:
+     * - il messaggio originario: è il quale l'utente ha risposto in modo privato e viene creato un canale privato */
+    public void stampaConversazionePrivata(List<Messaggio> conversazione, int idCanale, int idProgetto) {
+        Scanner scanner = new Scanner(System.in);
+        int messaggiPerPagina = 5;  // Numero di messaggi per pagina
+        List<Messaggio> messaggiDaVisualizzare = new ArrayList<>(conversazione);
+
+        /* I messaggi sono organizzati in pagine e i capi progetto e dipendenti possono visualizzare,
+        una per una, le pagine della conversazione.*/
+
+        // Estrai il primo messaggio dalla lista e recupera il messaggio originale
+        Messaggio primoMessaggio = messaggiDaVisualizzare.getFirst();
+        Messaggio messaggioOriginario = recuperaMessaggioOriginale(primoMessaggio);
+
+        // Aggiungi il messaggio originario all'inizio della lista
+        messaggiDaVisualizzare.addFirst(messaggioOriginario);
+
+        int numeroPagine = (int) Math.ceil((double) messaggiDaVisualizzare.size() / messaggiPerPagina);
+        int paginaCorrente = 0;
+
+        while (true) {
+            // Calcola l'indice di inizio e fine per la pagina corrente
+            int start = paginaCorrente * messaggiPerPagina;
+            int end = Math.min(start + messaggiPerPagina, messaggiDaVisualizzare.size());
+
+            Printer.printlnBlu("\n***** DETTAGLI CONVERSAZIONE - PAGINA " + (paginaCorrente + 1) + " di " + numeroPagine + " *****");
+
+            // Stampa i messaggi per la pagina corrente con numerazione
+            for (int i = start; i < end; i++) {
+                Messaggio messaggio = messaggiDaVisualizzare.get(i);
+                int numeroMessaggio = i + 1;  // Numero univoco del messaggio
+
+                if (messaggio.isRisposta()) {
+                    int numeroMessaggioOriginale = trovaIndiceMessaggioOriginale(messaggiDaVisualizzare, messaggio.getMessaggioOriginale());
+                    if (numeroMessaggioOriginale != -1) {
+                        Printer.printlnViola("Risposta al Messaggio #" + numeroMessaggioOriginale);
+                    } else {
+                        Printer.println("Risposta a un messaggio non trovato.");
+                    }
+                }
+
+                Printer.println("Messaggio #" + numeroMessaggio);
+                Printer.print("Nome: " + messaggio.getNomeUtente() + "   ");
+                Printer.println("Cognome: " + messaggio.getCognomeUtente());
+                Printer.print("Data Invio: " + messaggio.getDataInvio() + "   ");
+                Printer.println("Orario Invio: " + messaggio.getOrarioInvio());
+                Printer.println("Contenuto: " + messaggio.getContenuto());
+                Printer.println("-------------------------------");
+            }
+
+            // Chiedi all'utente cosa fare
+            Printer.println("\n[1] Pagina precedente | [2] Pagina successiva | [3] Rispondi | [0] Esci");
+            int scelta = scanner.nextInt();
+
+            if (scelta == 1 && paginaCorrente > 0) {
+                paginaCorrente--;  // Vai alla pagina precedente
+            } else if (scelta == 2 && paginaCorrente < numeroPagine - 1) {
+                paginaCorrente++;  // Vai alla pagina successiva
+            } else if (scelta == 3) {
+                rispondiAMessaggioPubblico(messaggiDaVisualizzare, scanner, idCanale, idProgetto);
+                break;  // Esci dalla visualizzazione dopo aver risposto
+            } else if (scelta == 0) {
+                break;  // Esci dalla visualizzazione
+            } else {
+                Printer.errorMessage("Scelta non valida, riprova.");
+            }
+        }
+    }
+
+
+
+    private Messaggio recuperaMessaggioOriginale(Messaggio primoMessaggio) {
+        String cfMittente = primoMessaggio.getCfUtente();
+        Date dataInvio = primoMessaggio.getDataInvio();
+        Time orarioInvio = primoMessaggio.getOrarioInvio();
+
+        DipendenteController dipendenteController = new DipendenteController();
+        return dipendenteController.recuperoMessaggioOriginario(cfMittente, dataInvio, orarioInvio);
+    }
+
+
+
+
+
+
+
+
+
+
+
 
 
 
