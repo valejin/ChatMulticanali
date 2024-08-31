@@ -71,7 +71,7 @@ public class CapoprogettoController implements Controller{
 
         try{
             creaCanaleDAO.inserireNuovoCanale(canaleBean);
-            Printer.println("Canale creato con successo!");
+            Printer.printlnViola("Canale creato con successo!");
         } catch(SQLException e){
             Printer.errorMessage("Errore all'inserimento di nuovo canale da Capo progetto");
             e.printStackTrace();  // Per debug, stampa lo stack trace
@@ -348,9 +348,14 @@ public class CapoprogettoController implements Controller{
 
         // Chiama DAO per memorizzare in DB
         AssegnaProgettoDAO assegnaProgettoDAO = new AssegnaProgettoDAO();
-        assegnaProgettoDAO.assegnaProgetto(lavoratore, idProgettoScelto);
 
-        Printer.printlnViola("L'assegnazione progetto avvenuta con successo!");
+        try {
+            assegnaProgettoDAO.assegnaProgetto(lavoratore, idProgettoScelto);
+            Printer.printlnViola("L'assegnazione progetto avvenuta con successo!");
+        }catch(DAOException e){
+            Printer.errorMessage("Lavoratore già fa parte del progetto.");
+        }
+
     }
 
 
@@ -388,7 +393,7 @@ public class CapoprogettoController implements Controller{
         }
 
         // Chiama VIEW per stampare conversazioni
-        capoprogettoView.stampaConversazionePrivataSoloLettura(conversazioni,idCanaleScelto,idProgettoScelto);
+        capoprogettoView.stampaConversazionePrivataSoloLettura(conversazioni);
 
 
     }

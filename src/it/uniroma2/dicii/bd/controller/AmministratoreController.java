@@ -82,7 +82,7 @@ public class AmministratoreController implements Controller {
 /*------------ Metodo per assegnare un capo progetto a un progetto esistente */
     public void assegnaCapoprogetto() throws SQLException {
 
-        Object[] risultato = null;
+        Object[] risultato;
         try {
             risultato = AmministratoreView.assegnaCapoProgetto();
         } catch (SQLException e) {
@@ -157,7 +157,7 @@ public class AmministratoreController implements Controller {
 
 
 /*------------ Metodo per restituire la lista di progetti con i relativi capi progetto */
-    public List<Progetto> ListaConCapo(){
+    public List<Progetto> listaConCapo(){
         List<Progetto> progettiConCapo;
 
         progettiConCapo = PrintListProgettoCapoDAO.listaProgettiConCapo();

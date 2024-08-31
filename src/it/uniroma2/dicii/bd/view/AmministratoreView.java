@@ -216,7 +216,7 @@ public class AmministratoreView {
         Printer.println("Lista di progetti con capo progetto assegnato: ");
 
         AmministratoreController amministratoreController = new AmministratoreController();
-        List<Progetto> listProgetti = amministratoreController.ListaConCapo();
+        List<Progetto> listProgetti = amministratoreController.listaConCapo();
 
         // Itera e stampa dei dettagli dei progetti con capo
         for (Progetto progetto : listProgetti) {

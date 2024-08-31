@@ -1,5 +1,6 @@
 package it.uniroma2.dicii.bd.dao;
 
+import it.uniroma2.dicii.bd.exception.DAOException;
 import it.uniroma2.dicii.bd.model.Canale;
 import it.uniroma2.dicii.bd.model.Lavoratore;
 import it.uniroma2.dicii.bd.model.domain.Role;
@@ -65,7 +66,7 @@ public class AssegnaProgettoDAO {
 
 
     /* Metodo per assegnare il progetto scelto al lavoratore scelto */
-    public void assegnaProgetto(Lavoratore lavoratore, int idProgetto){
+    public void assegnaProgetto(Lavoratore lavoratore, int idProgetto)throws DAOException {
 
         Connection conn;
         CallableStatement cs;
@@ -83,7 +84,7 @@ public class AssegnaProgettoDAO {
             cs.execute();
 
         }catch (SQLException e){
-            e.printStackTrace();
+            throw new DAOException();
         }
 
 
