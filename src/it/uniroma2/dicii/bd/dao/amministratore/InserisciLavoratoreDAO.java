@@ -19,13 +19,15 @@ public class InserisciLavoratoreDAO {
             conn = ConnectionFactory.getConnection();
 
             // Prepara la chiamata alla stored procedure
-            cs = conn.prepareCall("{call inserisci_lavoratore(?,?,?,?)}");
+            cs = conn.prepareCall("{call inserisci_lavoratore(?,?,?,?,?,?)}");
 
             // INFO: cf, nome, cognome, ruolo
             cs.setString(1,userBean.getCF());
             cs.setString(2, userBean.getNome());
             cs.setString(3, userBean.getCognome());
             cs.setInt(4, userBean.getRuoloId());
+            cs.setString(5, userBean.getUsername());
+            cs.setString(6, userBean.getPassword());
 
             // Esegui la stored procedure
             cs.execute();

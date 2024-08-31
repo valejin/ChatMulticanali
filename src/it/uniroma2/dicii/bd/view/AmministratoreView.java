@@ -33,7 +33,7 @@ public class AmministratoreView {
         Printer.println("2) Assegna capo progetto");
         Printer.println("3) Visualizza lista progetti con capo progetto");
         Printer.println("4) Visualizza lista progetti senza capo progetto");
-        Printer.println("5) Inserisci nuovo lavoratore");
+        Printer.println("5) Inserisci nuovo lavoratore in sistema");
         Printer.println("0) Quit");
 
 
@@ -258,7 +258,7 @@ public class AmministratoreView {
         Scanner input = new Scanner(System.in);
         Printer.println("Compila il seguente modulo: ");
 
-        //INFO: cf, nome, cognome, ruolo
+        //INFO: cf, nome, cognome, ruolo, username, password
         Printer.print("CF lavoratore: ");
         String cfUtente = input.nextLine();
 
@@ -267,6 +267,29 @@ public class AmministratoreView {
 
         Printer.print("Cognome: ");
         String cognome = input.nextLine();
+
+        Printer.print("Username: ");
+        String username = input.nextLine();
+
+        // Variabili per la password e la conferma
+        String password = "";
+        String confermaPassword = "";
+
+        // Ciclo per richiedere la password fino a quando non corrisponde con la conferma
+        while (true) {
+            Printer.print("Password: ");
+            password = input.nextLine();
+
+            Printer.print("Conferma password: ");
+            confermaPassword = input.nextLine();
+
+            if (password.equals(confermaPassword)) {
+                break;  // Esce dal ciclo se le password corrispondono
+            } else {
+                Printer.errorMessage("Le password non corrispondono. Per favore, riprova.");
+            }
+        }
+
 
 
         // Variabile per il ruolo
@@ -309,6 +332,8 @@ public class AmministratoreView {
         userBean.setNome(nome);
         userBean.setCognome(cognome);
         userBean.setRuolo(ruolo);
+        userBean.setUsername(username);
+        userBean.setPassword(password);
 
         return userBean;
 
