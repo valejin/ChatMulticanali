@@ -133,6 +133,20 @@ public class CapoprogettoController implements Controller{
 
 
 
+    /* Metodo per recuperare la lista dei canali pubblici a cui fa parte, chiamato da VIEW */
+    public List<Canale> recuperoCanaliPubblici(int idProgetto){
+
+        AssegnaCanaleDAO assegnaCanaleDAO = new AssegnaCanaleDAO();
+        List<Canale> canaleList = assegnaCanaleDAO.recuperoCanaliPubblici(idProgetto);
+
+        return canaleList;
+
+    }
+
+
+
+
+
 
     /* Metodo per visualizzare le conversazioni in un canale scelto da utente, chiamato da switch case 3 */
     public void visualizzaConversazione(){
@@ -235,9 +249,13 @@ public class CapoprogettoController implements Controller{
 
         // Chiama DAO per memorizzare tale assegnazione
         AssegnaCanaleDAO assegnaCanaleDAO = new AssegnaCanaleDAO();
-        assegnaCanaleDAO.salvaAssegnazioneCanale(lavoratore, idCanaleScelto, idProgettoScelto);
 
-        Printer.printlnViola("Assegnazione avvenuta con successo!");
+        try {
+            assegnaCanaleDAO.salvaAssegnazioneCanale(lavoratore, idCanaleScelto, idProgettoScelto);
+        }catch (DAOException d){
+            Printer.errorMessage("Lavoratore scelto già fa parte del canale.");
+        }
+
     }
 
 

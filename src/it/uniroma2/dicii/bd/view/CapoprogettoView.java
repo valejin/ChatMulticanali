@@ -511,7 +511,7 @@ public class CapoprogettoView {
 
         // Chiama il metodo di controller che restituisce tutti i canali di tale progetto
         Printer.printlnBlu("\nLista di canali disponibili per il progetto scelto: ");
-        List<Canale> canaleList = capoprogettoController.recuperoCanali(idProgettoScelto);
+        List<Canale> canaleList = capoprogettoController.recuperoCanaliPubblici(idProgettoScelto);
 
         // Itera e stampa i canali che appartengono al id progetto scelto
         for (Canale canale : canaleList) {

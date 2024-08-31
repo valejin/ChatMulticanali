@@ -1,9 +1,12 @@
 package it.uniroma2.dicii.bd.dao.capoprogetto;
 
+import it.uniroma2.dicii.bd.exception.DAOException;
+import it.uniroma2.dicii.bd.model.Canale;
 import it.uniroma2.dicii.bd.model.Lavoratore;
 import it.uniroma2.dicii.bd.dao.ConnectionFactory;
 import it.uniroma2.dicii.bd.model.domain.Role;
 import it.uniroma2.dicii.bd.utils.Printer;
+import it.uniroma2.dicii.bd.utils.UserSession;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -57,8 +60,8 @@ public class AssegnaCanaleDAO {
             }
 
         } catch(SQLException e){
-            e.printStackTrace();
             Printer.errorMessage("Errore recupero lavoratore by id progetto in DAO");
+            e.printStackTrace();
         }
         return lavoratoreList;
     }
@@ -66,7 +69,7 @@ public class AssegnaCanaleDAO {
 
 
     /* Metodo per salvare assegnazione del canale al lavoratore */
-    public void salvaAssegnazioneCanale(Lavoratore lavoratore, int idCanale, int idProgetto){
+    public void salvaAssegnazioneCanale(Lavoratore lavoratore, int idCanale, int idProgetto) throws DAOException {
 
         Connection conn;
         CallableStatement cs;
@@ -84,13 +87,63 @@ public class AssegnaCanaleDAO {
             // Esegui la stored procedure
             cs.execute();
 
-
         }catch (SQLException e){
+            throw new DAOException();
+        }
+        Printer.printlnViola("Assegnazione avvenuta con successo!");
+    }
+
+
+
+    /* Metodo per recuperare la lista dei canali pubblici a cui capo fa parte */
+    public List<Canale> recuperoCanaliPubblici(int idProgetto){
+
+        List<Canale> canaleList = new ArrayList<>();
+        Connection conn;
+        CallableStatement cs;
+        ResultSet rs;
+
+        try {
+            conn = ConnectionFactory.getConnection();
+            UserSession session = UserSession.getInstance();
+
+            // Prepara la chiamata alla stored procedure
+            cs = conn.prepareCall("{call lista_canali_public_by_IDprogetto(?,?)}");
+
+            //mettere id progetto
+            cs.setString(1, session.getCf());
+            cs.setInt(2, idProgetto);
+
+            // Esegui la stored procedure
+            boolean result = cs.execute();
+
+            // risultati
+            // Se c'è un result set
+            if (result) {
+                rs = cs.getResultSet();
+                while (rs.next()) {
+                    // Crea un nuovo oggetto Canale per ogni riga del result set
+                    Canale canale = new Canale();
+
+                    canale.setIdCanale(rs.getInt("IDCanale"));
+                    canale.setNome(rs.getString("Nome"));
+                    canale.setCfCreatore(rs.getString("Creatore"));
+                    canale.setData(rs.getDate("DataCreazione"));
+
+                    // Recupera il valore ENUM dal database come stringa
+                    String tipoString = rs.getString("Tipo");
+                    Canale.Tipo tipo = Canale.Tipo.valueOf(tipoString.toUpperCase()); // Conversione da stringa a ENUM
+                    canale.setTipo(tipo);
+
+                    canaleList.add(canale);
+                }
+            }
+
+        } catch(SQLException e){
+            Printer.errorMessage("Errore nell'recupera canali by Id progetto");
             e.printStackTrace();
         }
-
-
-
+        return canaleList;
     }
 
 
