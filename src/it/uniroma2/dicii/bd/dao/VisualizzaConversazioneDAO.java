@@ -1,7 +1,9 @@
 package it.uniroma2.dicii.bd.dao;
 
 import it.uniroma2.dicii.bd.exception.DAOException;
+import it.uniroma2.dicii.bd.model.Canale;
 import it.uniroma2.dicii.bd.model.Messaggio;
+import it.uniroma2.dicii.bd.utils.Printer;
 import it.uniroma2.dicii.bd.utils.UserSession;
 
 import java.sql.*;
@@ -116,14 +118,10 @@ public class VisualizzaConversazioneDAO {
 
             }
 
-
-
         }catch(SQLException e){
             e.printStackTrace();
         }
-
         return messaggioOriginario;
-
     }
 
 
@@ -221,7 +219,7 @@ public class VisualizzaConversazioneDAO {
             UserSession session = UserSession.getInstance();
 
             // Prepara la chiamata alla stored procedure
-            cs = conn.prepareCall("{call inserisci_risposta_privata(?,?,?,?,?,?,?,?,?,?)}");
+            cs = conn.prepareCall("{call inserisci_risposta_privata(?,?,?,?,?,?,?,?,?)}");
 
             //in tabella Risposta: mittenteCF, dataInvioM, orarioInvioM, visibilità, rispondenteCF, dataInvioR, orarioInvioR
             //in messaggio: CFmittente, dataInvio, orarioInvio, contenuto, idCanale, id Progetto
@@ -238,24 +236,72 @@ public class VisualizzaConversazioneDAO {
             cs.setString(7, messaggioOriginale.getCfUtente());  //CF mittente messaggio originario
             cs.setDate(8, messaggioOriginale.getDataInvio());  //dataInvio messaggio originario
             cs.setTime(9, messaggioOriginale.getOrarioInvio());  //orarioInvio messaggio originario
-            cs.setString(10, messaggioOriginale.getContenuto());  //contenuto messaggio originario
+            //cs.setString(10, messaggioOriginale.getContenuto());  //contenuto messaggio originario
             // visibilità verrà settato in SQL
 
             // Esegui la stored procedure
             cs.execute();
-
 
         } catch(SQLException e){
             e.printStackTrace();
             throw new DAOException("Errore in DAO");
         }
 
-
     }
 
 
 
 
+    /* Metodo per recuperare i canali privati, in cui capoProgetto non appartiene */
+    public List<Canale> recuperoCanaliPrivati(int idProgetto){
+
+        Connection conn;
+        CallableStatement cs;
+        ResultSet rs;
+        List<Canale> canaleList = new ArrayList<>();
+
+        try {
+            conn = ConnectionFactory.getConnection();
+            UserSession session = UserSession.getInstance();
+
+            // Prepara la chiamata alla stored procedure
+            cs = conn.prepareCall("{call lista_canali_privati_by_IDprogetto(?,?)}");
+
+            //mettere id progetto
+            cs.setString(1, session.getCf());
+            cs.setInt(2, idProgetto);
+
+            // Esegui la stored procedure
+            boolean result = cs.execute();
+
+            // risultati
+            // Se c'è un result set
+            if (result) {
+                rs = cs.getResultSet();
+                while (rs.next()) {
+                    // Crea un nuovo oggetto Canale per ogni riga del result set
+                    Canale canale = new Canale();
+
+                    canale.setIdCanale(rs.getInt("IDCanale"));
+                    canale.setCfCreatore(rs.getString("Creatore"));
+                    canale.setData(rs.getDate("DataCreazione"));
+
+                    // Recupera il valore ENUM dal database come stringa
+                    String tipoString = rs.getString("Tipo");
+                    Canale.Tipo tipo = Canale.Tipo.valueOf(tipoString.toUpperCase()); // Conversione da stringa a ENUM
+                    canale.setTipo(tipo);
+
+                    canaleList.add(canale);
+                }
+            }
+
+        } catch(SQLException e){
+            Printer.errorMessage("Errore nell'recupera canali by Id progetto");
+            e.printStackTrace();
+        }
+
+        return canaleList;
+    }
 
 
 

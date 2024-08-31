@@ -51,7 +51,7 @@ public class CapoprogettoController implements Controller{
                 case 7 -> visualizzaPartecipantiProgetto();
                 case 8 -> visualizzaPartecipantiCanali();
                 case 9 -> assegnaProgetto();
-                //case 10 -> visualizzaConversazionePrivata();
+                case 10 -> visualizzaConversazionePrivata();
                 case 0 -> System.exit(0);
                 default -> throw new RuntimeException("Invalid choice");
             }
@@ -179,7 +179,6 @@ public class CapoprogettoController implements Controller{
         } catch(DAOException e){
             e.printStackTrace();
         }
-
         return messaggioOriginale;
     }
 
@@ -196,7 +195,6 @@ public class CapoprogettoController implements Controller{
             VisualizzaConversazioneDAO.inserisciRisposta(messaggioOriginale, contenutoRisposta, 0);
             Printer.printlnViola("Risposta pubblica inviata con successo.");
 
-
         } catch (DAOException e) {
             Printer.errorMessage("Errore durante l'invio della risposta pubblica.");
         }
@@ -212,6 +210,7 @@ public class CapoprogettoController implements Controller{
         try {
             VisualizzaConversazioneDAO visualizzaConversazioneDAO = new VisualizzaConversazioneDAO();
             visualizzaConversazioneDAO.inserisciRispostaPrivata(messaggioOriginale, contenutoRisposta);
+            Printer.printlnViola("Risposta inviata con successo!");
         } catch(DAOException e){
             Printer.errorMessage("Errore inserimento risposta privata in DB con nuovo metodo");
             e.printStackTrace();
@@ -354,15 +353,40 @@ public class CapoprogettoController implements Controller{
     public void visualizzaConversazionePrivata(){
 
         CapoprogettoView capoprogettoView = new CapoprogettoView();
+        Object[] infoCanale = capoprogettoView.visualizzaConversazionePrivata();
+        // Viene restituito ID progetto e ID canale
+        int idCanaleScelto = (int) infoCanale[0];
+        int idProgettoScelto = (int) infoCanale[1];
 
 
+        List<Messaggio> conversazioni = null;
+
+        // Chiamo DAO per recuperare i messaggi del canale scelto, poi li restituisco a VIEW per stampare all'utente
+        VisualizzaConversazioneDAO visualizzaConversazioneDAO = new VisualizzaConversazioneDAO();
+        try {
+            conversazioni = visualizzaConversazioneDAO.recuperoConversazione(idCanaleScelto, idProgettoScelto);
+        } catch(DAOException e){
+            Printer.errorMessage("Errore Visualizzazione Conversazione Controller");
+        }
+
+        // Chiama VIEW per stampare conversazioni
+        capoprogettoView.stampaConversazionePrivataSoloLettura(conversazioni,idCanaleScelto,idProgettoScelto);
 
 
     }
 
 
 
+    /* Metodo per recuperare i canali in cui capoProgetto non appartiene del progetto, chiamato da VIEW */
+    public List<Canale> recuperoCanaliNonAppartiene(int idProgetto){
 
+        List<Canale> canaleList;
+
+        VisualizzaConversazioneDAO visualizzaConversazioneDAO = new VisualizzaConversazioneDAO();
+        canaleList = visualizzaConversazioneDAO.recuperoCanaliPrivati(idProgetto);
+
+        return canaleList;
+    }
 
 
 
