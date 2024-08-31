@@ -109,9 +109,9 @@ public class InserisciMessaggioDAO {
     public static List<Progetto> recuperoListProgetti() throws SQLException{
 
         List<Progetto> progettiTarget = new ArrayList<>();
-        Connection conn = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
+        Connection conn;
+        CallableStatement cs;
+        ResultSet rs;
 
         try {
             conn = ConnectionFactory.getConnection();
@@ -134,7 +134,7 @@ public class InserisciMessaggioDAO {
                     progetto.setNome(rs.getString("Nome"));
                     progetto.setDataInzio(rs.getDate("DataInizio"));
                     progetto.setDataScadenza(rs.getDate("DataScadenza"));
-
+                    progetto.setCapoProgetto(rs.getString("CapoProgetto"));
 
                     // Aggiungi il progetto alla lista
                     progettiTarget.add(progetto);

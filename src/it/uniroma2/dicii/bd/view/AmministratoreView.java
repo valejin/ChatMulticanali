@@ -137,7 +137,7 @@ public class AmministratoreView {
 
     public static Object[] assegnaCapoProgetto() throws SQLException {
 
-        //devo prima stampare i progetti senza capi, poi faccio scegliere i capi tra  una lista di lavoratori
+        //devo prima stampare i progetti senza capi, poi faccio scegliere i capi tra una lista di lavoratori
         Scanner input = new Scanner(System.in);
         List<Progetto> progettiSenzaCapo;
 
@@ -272,8 +272,8 @@ public class AmministratoreView {
         String username = input.nextLine();
 
         // Variabili per la password e la conferma
-        String password = "";
-        String confermaPassword = "";
+        String password;
+        String confermaPassword;
 
         // Ciclo per richiedere la password fino a quando non corrisponde con la conferma
         while (true) {

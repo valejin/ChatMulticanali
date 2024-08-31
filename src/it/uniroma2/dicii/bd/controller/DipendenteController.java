@@ -6,7 +6,6 @@ import it.uniroma2.dicii.bd.model.Canale;
 import it.uniroma2.dicii.bd.model.Lavoratore;
 import it.uniroma2.dicii.bd.model.Messaggio;
 import it.uniroma2.dicii.bd.model.Progetto;
-import it.uniroma2.dicii.bd.dao.capoprogetto.CreaCanaleDAO;
 import it.uniroma2.dicii.bd.model.domain.Role;
 import it.uniroma2.dicii.bd.utils.Printer;
 import it.uniroma2.dicii.bd.view.DipendenteView;
@@ -62,7 +61,7 @@ public class DipendenteController implements Controller{
         DipendenteView dipendenteView = new DipendenteView();
         Object[] datiMessaggio = dipendenteView.inserisciMessaggio();
 
-        // Estraggo le informazioni dall'array di oggetti
+        // Estraggo le informazioni da array di oggetti
         String contenutoMessaggio = (String) datiMessaggio[0];
         int idCanaleScelto = (int) datiMessaggio[1];
         int idProgettoScelto = (int) datiMessaggio[2];
@@ -94,7 +93,7 @@ public class DipendenteController implements Controller{
     /* Metodo per recuperare la lista di canali con id progetto fornito, chiamato da VIEW */
     public List<Canale> recuperoCanali(int idProgetto){
 
-        List<Canale> canaliTarget = null;
+        List<Canale> canaliTarget;
 
         canaliTarget = InserisciMessaggioDAO.recuperaCanaliByIdProgetto(idProgetto);
 
@@ -120,11 +119,9 @@ public class DipendenteController implements Controller{
 
 
         // Chiama DAO per recuperare i messaggi del canale scelto, poi li restituisco a VIEW per stampare all'utente
-        VisualizzaConversazioneDAO visualizzaConversazioneDAO = new VisualizzaConversazioneDAO();
-
 
         try {
-            conversazioni = visualizzaConversazioneDAO.recuperoConversazione(idCanaleScelto, idProgettoScelto);
+            conversazioni = VisualizzaConversazioneDAO.recuperoConversazione(idCanaleScelto, idProgettoScelto);
         } catch(DAOException e){
             Printer.errorMessage("Errore Visualizzazione Conversazione Controller");
         }
@@ -226,7 +223,7 @@ public class DipendenteController implements Controller{
     /* Metodo per recuperare la lista di canali appartenenti da DB, chiamato da VIEW */
     public List<Canale> recuperoCanaliAppartenenti(){
 
-        List<Canale> canaliTarget = null;
+        List<Canale> canaliTarget;
         canaliTarget = VisualizzaAppartenenzaCanaliDAO.recuperaCanali();
 
         return canaliTarget;

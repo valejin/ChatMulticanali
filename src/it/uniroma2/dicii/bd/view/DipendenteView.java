@@ -1,6 +1,5 @@
 package it.uniroma2.dicii.bd.view;
 
-import it.uniroma2.dicii.bd.controller.CapoprogettoController;
 import it.uniroma2.dicii.bd.controller.DipendenteController;
 import it.uniroma2.dicii.bd.model.Canale;
 import it.uniroma2.dicii.bd.model.Lavoratore;
@@ -39,15 +38,61 @@ public class DipendenteView {
         int choice;
         while (true) {
             Printer.print("Please enter your choice: ");
-            choice = input.nextInt();
-            if (choice >= 0 && choice <= 5) {  //da cambiare il valore di limite
-                break;
+
+            // Controlla se l'input è un intero
+            if (input.hasNextInt()) {
+                choice = input.nextInt();
+
+                // Verifica se la scelta è nell'intervallo corretto
+                if (choice >= 0 && choice <= 5) {
+                    break;
+                } else {
+                    Printer.errorMessage("Invalid option. Please enter a number between 0 and 5.");
+                }
+            } else {
+                // Se l'input non è un intero, mostra un errore
+                Printer.errorMessage("Invalid input. Please enter an integer.");
+                input.next(); // Consuma l'input non valido
             }
-            Printer.errorMessage("Invalid option");
         }
 
         return choice;
     }
+
+
+
+
+
+    private static void stampaListaProgetti(List<Progetto> progetti) {
+
+        for (Progetto progetto : progetti) {
+            Printer.println("ID Progetto: " + progetto.getId());
+            Printer.println("Nome Progetto: " + progetto.getNome());
+            Printer.println("Data Inizio: " + progetto.getDataInzio());
+            Printer.println("Data Scadenza: " + progetto.getDataScadenza());
+            Printer.println("-------------------------------");
+        }
+    }
+
+
+
+    private static void stampaListaCanali(List<Canale> canali) {
+
+        for (Canale canale : canali) {
+            Printer.println("ID Canale: " + canale.getIdCanale());
+            Printer.println("Nome Canale: " + canale.getNome());
+            Printer.println("CF creatore: " + canale.getCfCreatore());
+            Printer.println("Data creazione: " + canale.getData());
+            Printer.println("Tipo di canale: " + canale.getTipo());
+            Printer.println("-------------------------------");
+        }
+    }
+
+
+
+
+
+
 
 
     /* Metodo per ottenere scelta di utente su inserimento di messaggio, chiamato da controller */
@@ -64,16 +109,10 @@ public class DipendenteView {
         List<Progetto> progettiCandidati;
 
         DipendenteController dipendenteController = new DipendenteController();
-        progettiCandidati = dipendenteController.recuperoProgetti();
+        progettiCandidati = DipendenteController.recuperoProgetti();
 
         // Itera e stampa dei dettagli dei progetti con dipendente loggato
-        for (Progetto progetto : progettiCandidati) {
-            Printer.println("ID Progetto: " + progetto.getId());
-            Printer.println("Nome Progetto: " + progetto.getNome());
-            Printer.println("Data Inizio: " + progetto.getDataInzio());
-            Printer.println("Data Scadenza: " + progetto.getDataScadenza());
-            Printer.println("-------------------------------");
-        }
+        stampaListaProgetti(progettiCandidati);
 
         Printer.print("\nInserisci l'ID del progetto in cui vuoi inviare un messaggio: ");
         int idProgettoScelto = input.nextInt();
@@ -85,15 +124,7 @@ public class DipendenteView {
         List<Canale> canaleList = dipendenteController.recuperoCanali(idProgettoScelto);
 
         // Itera e stampa i canali che appartengono al id progetto scelto
-        for (Canale canale : canaleList) {
-            Printer.println("ID Canale: " + canale.getIdCanale());
-            Printer.println("Nome Canale: " + canale.getNome());
-            Printer.println("CF creatore: " + canale.getCfCreatore());
-            Printer.println("Data creazione: " + canale.getData());
-            Printer.println("Tipo di canale: " + canale.getTipo());
-            Printer.println("-------------------------------");
-        }
-
+        stampaListaCanali(canaleList);
 
         Printer.print("\nInserisci l'ID del canale in cui vuoi inviare un messaggio: ");
         int idCanaleScelto = input.nextInt();
@@ -102,7 +133,6 @@ public class DipendenteView {
         // Raccolgo il contenuto del messaggio
         Printer.println("\nInserisci il messaggio (Premere INVIO per confermare l'invio di messaggio): ");
         String contenutoMessaggio = input.nextLine();
-
 
         // Restituisco un array di oggetti con il contenuto del messaggio, ID del canale e ID del progetto
         return new Object[]{contenutoMessaggio, idCanaleScelto, idProgettoScelto};
@@ -120,20 +150,14 @@ public class DipendenteView {
         Printer.printlnBlu("\nLista di progetti a cui fa parte: ");
 
         // Stampo lista di progetti a cui fa parte
-        List<Progetto> progettiCandidati = new ArrayList<>();
+        List<Progetto> progettiCandidati;
         DipendenteController dipendenteController = new DipendenteController();
 
         // Chiama il metodo di controller per restituire i progetti
-        progettiCandidati = dipendenteController.recuperoProgetti();
+        progettiCandidati = DipendenteController.recuperoProgetti();
 
-        // Itera e stampa dei dettagli dei progetti con capoprogetto loggato
-        for (Progetto progetto : progettiCandidati) {
-            Printer.println("ID Progetto: " + progetto.getId());
-            Printer.println("Nome Progetto: " + progetto.getNome());
-            Printer.println("Data Inizio: " + progetto.getDataInzio());
-            Printer.println("Data Scadenza: " + progetto.getDataScadenza());
-            Printer.println("-------------------------------");
-        }
+        // Itera e stampa dei dettagli dei progetti con capoProgetto loggato
+        stampaListaProgetti(progettiCandidati);
 
         Printer.print("\nInserisci l'ID del progetto in cui vuoi inviare un messaggio: ");
         int idProgettoScelto = input.nextInt();
@@ -144,14 +168,7 @@ public class DipendenteView {
         List<Canale> canaleList = dipendenteController.recuperoCanali(idProgettoScelto);
 
         // Itera e stampa i canali che appartengono al id progetto scelto
-        for (Canale canale : canaleList) {
-            Printer.println("ID Canale: " + canale.getIdCanale());
-            Printer.println("Nome Canale: " + canale.getNome());
-            Printer.println("CF creatore: " + canale.getCfCreatore());
-            Printer.println("Data creazione: " + canale.getData());
-            Printer.println("Tipo di canale: " + canale.getTipo());
-            Printer.println("-------------------------------");
-        }
+        stampaListaCanali(canaleList);
 
 
         Printer.print("\nInserisci l'ID del canale per visualizzare la conversazione: ");
@@ -171,14 +188,10 @@ public class DipendenteView {
 
         // Restituisce un array contenente l'ID del canale, l'ID del progetto e il tipo di canale
         return new Object[]{idCanaleScelto, idProgettoScelto, tipoCanaleScelto};
-
     }
 
 
-    /* Metodo per stampare le pagine di messaggi, chiamato da controller
-     * in caso di canale pubblico, viene stampato solo i messaggi pubblici
-     * in caso di canale privato (in cui utente appartiene), viene stampato solo i messaggi privati di quel canale
-     * bisogna capire come formulare stored produceres */
+    /* Metodo per stampare le pagine di messaggi, chiamato da controller */
     public void stampaConversazione(List<Messaggio> conversazione, int idCanale, int idProgetto, int tipoCanale) {
 
         Scanner scanner = new Scanner(System.in);
@@ -411,20 +424,12 @@ public class DipendenteView {
 
         // Stampo lista di progetti a cui fa parte
         List<Progetto> progettiCandidati;
-        DipendenteController dipendenteController = new DipendenteController();
 
         // Chiama il metodo di controller per restituire i progetti
-        progettiCandidati = dipendenteController.recuperoProgetti();
+        progettiCandidati = DipendenteController.recuperoProgetti();
 
-        // Itera e stampa dei dettagli dei progetti con capoprogetto loggato
-        for (Progetto progetto : progettiCandidati) {
-            Printer.println("ID Progetto: " + progetto.getId());
-            Printer.println("Nome Progetto: " + progetto.getNome());
-            Printer.println("Data Inizio: " + progetto.getDataInzio());
-            Printer.println("Data Scadenza: " + progetto.getDataScadenza());
-            Printer.println("-------------------------------");
-        }
-
+        // Itera e stampa dei dettagli dei progetti con capoProgetto loggato
+        stampaListaProgetti(progettiCandidati);
     }
 
 
@@ -477,6 +482,7 @@ public class DipendenteView {
             Printer.println("Nome Progetto: " + progetto.getNome());
             Printer.println("Data Inizio: " + progetto.getDataInzio());
             Printer.println("Data Scadenza: " + progetto.getDataScadenza());
+            Printer.println("Capo progetto: " + progetto.getCapoProgetto());
             Printer.println("-------------------------------");
         }
 
@@ -492,14 +498,7 @@ public class DipendenteView {
         List<Canale> canaleList = dipendenteController.recuperoCanali(idProgettoScelto);
 
         // Itera e stampa i canali che appartengono al id progetto scelto
-        for (Canale canale : canaleList) {
-            Printer.println("ID Canale: " + canale.getIdCanale());
-            Printer.println("Nome Canale: " + canale.getNome());
-            Printer.println("CF creatore: " + canale.getCfCreatore());
-            Printer.println("Data creazione: " + canale.getData());
-            Printer.println("Tipo di canale: " + canale.getTipo());
-            Printer.println("-------------------------------");
-        }
+        stampaListaCanali(canaleList);
 
         Printer.print("\nInserisci l'ID del canale che vuoi visualizzare i partecipanti: ");
         int idCanaleScelto = input.nextInt();
@@ -507,7 +506,7 @@ public class DipendenteView {
 
         // Lista dei lavoratori che appartiene al progetto scelto
         Printer.printlnBlu("\nLista dei lavoratori appartenenti al canale scelto: ");
-        List<Lavoratore> listLavoratori = new ArrayList<>();
+        List<Lavoratore> listLavoratori;
         listLavoratori = dipendenteController.recuperoLavoratoriByCanale(idCanaleScelto, idProgettoScelto);
 
         int index = 1;
@@ -521,10 +520,7 @@ public class DipendenteView {
             index++;
         }
 
-
     }
-
-
 
 
 
