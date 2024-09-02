@@ -12,7 +12,7 @@ public class InserisciLavoratoreDAO {
     /* Metodo per inserire il nuovo lavoratore in DB */
     public void inserisciLavoratore(UserBean userBean){
 
-        Connection conn = null;
+        Connection conn;
         CallableStatement cs;
 
         try{

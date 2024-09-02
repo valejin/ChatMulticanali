@@ -175,7 +175,7 @@ public class VisualizzaConversazioneDAO {
             UserSession session = UserSession.getInstance();
 
 
-            // Prepara la chiamata alla stored procedure
+            // Prepara la chiamata alla stored procedure per inserimento in tabella risposta
             cs = conn.prepareCall("{call inserisci_risposta(?,?,?,?,?,?,?)}");
 
             // Mettere: CFMittente, DataInvio, OrarioInvio, visibilità, CFRispondente, DataInvioRispondente, OrarioInvioRispondente
@@ -302,8 +302,6 @@ public class VisualizzaConversazioneDAO {
 
         return canaleList;
     }
-
-
 
 
 }

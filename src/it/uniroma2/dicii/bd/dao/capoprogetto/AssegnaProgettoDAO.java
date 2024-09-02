@@ -1,5 +1,6 @@
-package it.uniroma2.dicii.bd.dao;
+package it.uniroma2.dicii.bd.dao.capoprogetto;
 
+import it.uniroma2.dicii.bd.dao.ConnectionFactory;
 import it.uniroma2.dicii.bd.exception.DAOException;
 import it.uniroma2.dicii.bd.model.Canale;
 import it.uniroma2.dicii.bd.model.Lavoratore;
