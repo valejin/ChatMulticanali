@@ -18,9 +18,9 @@ import java.util.Scanner;
 public class AmministratoreView {
 
     public static void stampaTitolo(){
-        Printer.println("\n************************************");
-        Printer.printlnBlu("*    Benvenuto a ChatMulticanale   *");
-        Printer.println("************************************");
+        Printer.println("\n**************************************");
+        Printer.printlnBlu("*     Benvenuto a ChatMulticanale    *");
+        Printer.println("**************************************");
     }
 
 
@@ -117,7 +117,7 @@ public class AmministratoreView {
                     Printer.errorMessage("Errore: La data di inizio deve essere precedente alla data di scadenza. Riprova.");
                 }
             } catch (IllegalArgumentException e) {
-                Printer.println("Formato data non valido. Riprova (formato: yyyy-MM-dd).");
+                Printer.errorMessage("Formato data non valido. Riprova (formato: yyyy-MM-dd).");
             }
         }
 
@@ -148,6 +148,11 @@ public class AmministratoreView {
 
         progettiSenzaCapo = amministratoreController.stampaLista();
 
+        if (progettiSenzaCapo == null || progettiSenzaCapo.isEmpty()) {
+            Printer.errorMessage("Non ci sono progetti senza capo progetto. Operazione annullata.");
+            return new Object[0];
+        }
+
         // Itera e stampa dei dettagli dei progetti senza capo
         for (Progetto progetto : progettiSenzaCapo) {
             Printer.println("ID Progetto: " + progetto.getId());
@@ -173,6 +178,7 @@ public class AmministratoreView {
 
         if (progettoScelto == null) {
             Printer.errorMessage("ID progetto non valido. Riprova.");
+            return new Object[0];
         }
 
 
@@ -180,11 +186,15 @@ public class AmministratoreView {
         Printer.println("\nLista dei lavoratori candidati: ");
         List<CapoProgetto> listaCandidati = amministratoreController.stampaCandidatiCapo();
 
+        if (listaCandidati == null || listaCandidati.isEmpty()) {
+            Printer.errorMessage("Non ci sono candidati disponibili per il ruolo di capo progetto. Operazione annullata.");
+            return new Object[0];
+        }
 
         // Itera e stampa la lista dei CapoProgetto con una numerazione
         int index = 1;
         for (CapoProgetto candidato : listaCandidati) {
-            Printer.println(index + ") " + "CF: " + candidato.getCf() + "   Username: " + candidato.getNome());
+            Printer.println(index + ") " + "CF: " + candidato.getCf() + "   Nome: " + candidato.getNome() + " " + candidato.getCognome());
             index++;
         }
 
@@ -197,6 +207,7 @@ public class AmministratoreView {
         // Verifica se il numero scelto è valido
         if (numeroCandidatoScelto < 1 || numeroCandidatoScelto > listaCandidati.size()) {
             Printer.errorMessage("Numero non valido. Riprova.");
+            return new Object[0];
         }
 
 
@@ -224,11 +235,9 @@ public class AmministratoreView {
             Printer.println("Nome Progetto: " + progetto.getNome());
             Printer.println("Data Inizio: " + progetto.getDataInzio());
             Printer.println("Data Scadenza: " + progetto.getDataScadenza());
-            Printer.println("Capo progetto: " + progetto.getCapoProgetto());
+            Printer.println("CF capo progetto: " + progetto.getCapoProgetto());
             Printer.println("-------------------------------");
         }
-
-
     }
 
 
@@ -248,7 +257,6 @@ public class AmministratoreView {
             Printer.println("Capo progetto: " + progetto.getCapoProgetto());
             Printer.println("-------------------------------");
         }
-
     }
 
 
@@ -256,11 +264,20 @@ public class AmministratoreView {
     public UserBean nuovoUtente(){
         Printer.printlnBlu("\n***** INSERISCI NUOVO UTENTE IN SISTEMA *****\n");
         Scanner input = new Scanner(System.in);
-        Printer.println("Compila il seguente modulo: ");
+        Printer.printlnBlu("Compila il seguente modulo: ");
 
         //INFO: cf, nome, cognome, ruolo, username, password
-        Printer.print("CF lavoratore: ");
-        String cfUtente = input.nextLine();
+        String cfUtente;
+        while (true) {
+            Printer.print("CF lavoratore: ");
+            cfUtente = input.nextLine().toUpperCase();
+
+            if (validaFormatoCodiceFiscale(cfUtente)) {
+                break;
+            } else {
+                Printer.errorMessage("Il codice fiscale inserito non è valido. Deve essere composto da 16 caratteri alfanumerici. Per favore, riprova.");
+            }
+        }
 
         Printer.print("Nome: ");
         String nome = input.nextLine();
@@ -289,7 +306,6 @@ public class AmministratoreView {
                 Printer.errorMessage("Le password non corrispondono. Per favore, riprova.");
             }
         }
-
 
 
         // Variabile per il ruolo
@@ -326,7 +342,6 @@ public class AmministratoreView {
             }
         }
 
-
         UserBean userBean = new UserBean();
         userBean.setCF(cfUtente);
         userBean.setNome(nome);
@@ -336,10 +351,14 @@ public class AmministratoreView {
         userBean.setPassword(password);
 
         return userBean;
-
     }
 
 
+    /* Metodo per il controllo del formato di CF inserito da utente*/
+    private boolean validaFormatoCodiceFiscale(String cf) {
+        // Controlla che il CF sia lungo 16 caratteri e contenga solo caratteri alfanumerici
+        return cf.length() == 16 && cf.matches("^[A-Z0-9]+$");
+    }
 
 
 

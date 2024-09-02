@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Time;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CapoprogettoController implements Controller{
@@ -45,13 +46,13 @@ public class CapoprogettoController implements Controller{
                 case 1 -> creaCanale();
                 case 2 -> inserisciNuovoMessaggio();
                 case 3 -> visualizzaConversazione();
-                case 4 -> assegnaCanale();
-                case 5 -> visualizzaAppartenenzaProgetti();
-                case 6 -> visualizzaAppartenenzaCanali();
-                case 7 -> visualizzaPartecipantiProgetto();
-                case 8 -> visualizzaPartecipantiCanali();
-                case 9 -> assegnaProgetto();
-                case 10 -> visualizzaConversazionePrivata();
+                case 4 -> visualizzaConversazionePrivata();
+                case 5 -> assegnaCanale();
+                case 6 -> assegnaProgetto();
+                case 7 -> visualizzaAppartenenzaProgetti();
+                case 8 -> visualizzaAppartenenzaCanali();
+                case 9 -> visualizzaPartecipantiProgetto();
+                case 10 -> visualizzaPartecipantiCanali();
                 case 0 -> System.exit(0);
                 default -> throw new RuntimeException("Invalid choice");
             }
@@ -86,13 +87,14 @@ public class CapoprogettoController implements Controller{
     public static List<Progetto> recuperoProgetti(){
 
         CreaCanaleDAO creaCanaleDAO = new CreaCanaleDAO();
-        List<Progetto> progettiTarget = null;
+        List<Progetto> progettiTarget;
 
         try {
             progettiTarget = creaCanaleDAO.recuperoProgettiByCf();
 
-        } catch(SQLException e){
+        } catch(DAOException e){
             Printer.errorMessage("Errore recuperoProgetti in Controller");
+            return null;
         }
         return progettiTarget;
     }
@@ -137,10 +139,16 @@ public class CapoprogettoController implements Controller{
     public List<Canale> recuperoCanaliPubblici(int idProgetto){
 
         AssegnaCanaleDAO assegnaCanaleDAO = new AssegnaCanaleDAO();
-        List<Canale> canaleList = assegnaCanaleDAO.recuperoCanaliPubblici(idProgetto);
+        List<Canale> canaleList = new ArrayList<>();
+
+        try {
+            canaleList = assegnaCanaleDAO.recuperoCanaliPubblici(idProgetto);
+        } catch(DAOException e) {
+            Printer.errorMessage("Non ci sono progetti");
+            return null;
+        }
 
         return canaleList;
-
     }
 
 
@@ -266,8 +274,13 @@ public class CapoprogettoController implements Controller{
         AssegnaCanaleDAO assegnaCanaleDAO = new AssegnaCanaleDAO();
         List<Lavoratore> lavoratori;
 
-        lavoratori = assegnaCanaleDAO.recuperoLavoratoriByIdProgetto(idProgetto);
-        // il metodo restituisce una lista di lavoratori
+        try {
+            lavoratori = assegnaCanaleDAO.recuperoLavoratoriByIdProgetto(idProgetto);
+            // il metodo restituisce una lista di lavoratori
+        } catch(DAOException e){
+            Printer.errorMessage("Non ci sono lavoratori");
+            return null;
+        }
 
         return lavoratori;
     }

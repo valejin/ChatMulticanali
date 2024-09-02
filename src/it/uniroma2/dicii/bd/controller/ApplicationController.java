@@ -1,12 +1,10 @@
 package it.uniroma2.dicii.bd.controller;
 
-import it.uniroma2.dicii.bd.model.domain.Credentials;
 import it.uniroma2.dicii.bd.utils.UserSession;
 
 public class ApplicationController implements Controller{
 
     /* è il controller di main, ovvero permette di accedere in applicazione*/
-    Credentials cred;
 
     @Override
     public void start() {

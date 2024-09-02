@@ -1,6 +1,7 @@
 package it.uniroma2.dicii.bd.dao;
 
 import it.uniroma2.dicii.bd.exception.DAOException;
+import it.uniroma2.dicii.bd.exception.LoginException;
 import it.uniroma2.dicii.bd.model.domain.Credentials;
 import it.uniroma2.dicii.bd.model.domain.Role;
 import it.uniroma2.dicii.bd.utils.Printer;
@@ -10,7 +11,7 @@ import java.sql.*;
 public class LoginProcedureDAO implements GenericProcedureDAO<Credentials> {
 
     @Override
-    public Credentials execute(Object... params) throws DAOException {
+    public Credentials execute(Object... params) throws LoginException {
         String cf = (String) params[0];
         String password = (String) params[1];
         int role;
@@ -33,18 +34,17 @@ public class LoginProcedureDAO implements GenericProcedureDAO<Credentials> {
 
             cs.registerOutParameter(4, Types.VARCHAR);
 
-
             //La stored procedure viene eseguita
             cs.executeQuery();
 
             //Il ruolo dell'utente viene recuperato dal terzo parametro di output
             role = cs.getInt(3);  //restituisce un intero che è mio ruolo utente
-            Printer.println("Tipo di ruolo: " + role);
+            Printer.println("Tipo di ruolo: " + Role.fromInt(role));
 
             userName = cs.getString(4);
             Printer.println("Username: " + userName);
         } catch(SQLException e) {
-            throw new DAOException("Login error: " + e.getMessage());
+            throw new LoginException("Login error: " + e.getMessage());
         }
 
 

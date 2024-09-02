@@ -1,6 +1,7 @@
 package it.uniroma2.dicii.bd.dao.capoprogetto;
 
 import it.uniroma2.dicii.bd.bean.CanaleBean;
+import it.uniroma2.dicii.bd.exception.DAOException;
 import it.uniroma2.dicii.bd.model.Progetto;
 import it.uniroma2.dicii.bd.dao.ConnectionFactory;
 import it.uniroma2.dicii.bd.utils.Printer;
@@ -15,12 +16,12 @@ import java.util.List;
 
 public class CreaCanaleDAO {
 
-    public List<Progetto> recuperoProgettiByCf() throws SQLException {
+    public List<Progetto> recuperoProgettiByCf() throws DAOException {
 
         List<Progetto> progettiTarget = new ArrayList<>();
-        Connection conn = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
+        Connection conn;
+        CallableStatement cs;
+        ResultSet rs;
 
         try {
             conn = ConnectionFactory.getConnection();
@@ -50,7 +51,7 @@ public class CreaCanaleDAO {
                 }
             }
         } catch (SQLException e) {
-            Printer.errorMessage("Errore SQL: " + e.getMessage());
+            throw new DAOException();
         }
 
         return progettiTarget;

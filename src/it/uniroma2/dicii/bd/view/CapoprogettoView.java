@@ -20,9 +20,9 @@ import java.util.Scanner;
 public class CapoprogettoView {
 
     public static void stampaTitolo(){
-        Printer.println("\n************************************");
-        Printer.printlnBlu("*    Benvenuto a ChatMulticanale   *");
-        Printer.println("************************************");
+        Printer.println("\n**************************************");
+        Printer.printlnBlu("*     Benvenuto a ChatMulticanale    *");
+        Printer.println("**************************************");
     }
 
 
@@ -33,13 +33,15 @@ public class CapoprogettoView {
         Printer.println("1) Crea nuovo canale");
         Printer.println("2) Inserisci messaggio");
         Printer.println("3) Visualizza conversazioni appartenenti");
-        Printer.println("4) Assegna canale");
-        Printer.println("5) Visualizza partecipazione progetti");
-        Printer.println("6) Visualizza appartenenza canali");
-        Printer.println("7) Visualizza partecipanti del progetto");
-        Printer.println("8) Visualizza partecipanti del canale");
-        Printer.println("9) Assegna progetto");
-        Printer.println("10) Visualizza conversazioni privati (solo in lettura)");
+        Printer.println("4) Visualizza conversazioni privati (solo in lettura)");
+        Printer.println("5) Assegna canale");
+        Printer.println("6) Assegna progetto");
+        Printer.println("7) Visualizza partecipazione progetti");
+        Printer.println("8) Visualizza appartenenza canali");
+        Printer.println("9) Visualizza partecipanti del progetto");
+        Printer.println("10) Visualizza partecipanti del canale");
+
+
 
         Printer.println("0) Quit");
 
@@ -125,7 +127,12 @@ public class CapoprogettoView {
         List<Progetto> progettiCoordinati = CapoprogettoController.recuperoProgetti();
 
         Printer.printlnBlu("Lista di progetti da te coordinati: ");
-        stampaListaProgetti(progettiCoordinati);
+
+        if(progettiCoordinati == null || progettiCoordinati.isEmpty()){
+            Printer.errorMessage("Non ci sono progetti da te coordinati");
+        }else {
+            stampaListaProgetti(progettiCoordinati);
+        }
 
 
         // Chiedi all'utente di scegliere l'ID del progetto
@@ -176,7 +183,15 @@ public class CapoprogettoView {
 
         // Chiama il metodo di controller per restituire i progetti
         progettiCandidati = CapoprogettoController.recuperoProgetti();
-        stampaListaProgetti(progettiCandidati);
+
+        // Controllo se la lista è null o vuota
+        if (progettiCandidati == null || progettiCandidati.isEmpty()) {
+            Printer.errorMessage("Non sei associato a nessun progetto al momento.");
+            return new Object[0];
+        } else {
+            // Itera e stampa i dettagli dei progetti con capo progetto loggato
+            stampaListaProgetti(progettiCandidati);
+        }
 
 
         Printer.print("\nInserisci l'ID del progetto in cui vuoi inviare un messaggio: ");
@@ -225,8 +240,15 @@ public class CapoprogettoView {
         // Chiama il metodo di controller per restituire i progetti
         progettiCandidati = CapoprogettoController.recuperoProgetti();
 
-        // Itera e stampa dei dettagli dei progetti con capoProgetto loggato
-        stampaListaProgetti(progettiCandidati);
+
+        // Controllo se la lista è null o vuota
+        if (progettiCandidati == null || progettiCandidati.isEmpty()) {
+            Printer.errorMessage("Non sei associato a nessun progetto al momento.");
+            return new Object[0];
+        } else {
+            // Itera e stampa i dettagli dei progetti con capo progetto loggato
+            stampaListaProgetti(progettiCandidati);
+        }
 
         Printer.print("\nInserisci l'ID del progetto in cui vuoi inviare un messaggio: ");
         int idProgettoScelto = input.nextInt();
@@ -320,6 +342,7 @@ public class CapoprogettoView {
             // Chiedi all'utente cosa fare
             Printer.println("\n[1] Pagina precedente | [2] Pagina successiva | [3] Rispondi | [0] Esci");
             int scelta = scanner.nextInt();
+            scanner.nextLine();  // consumo newline
 
             if (scelta == 1 && paginaCorrente > 0) {
                 paginaCorrente--;  // Vai alla pagina precedente
@@ -377,8 +400,10 @@ public class CapoprogettoView {
             Printer.print("Inserisci il tuo messaggio privato: ");
             String contenutoRispostaPrivata = scanner.nextLine();
             capoprogettoController.memorizzaRispostaPrivata(messaggioOriginale, contenutoRispostaPrivata);
+            Printer.printlnViola("Risposta inviata con successo!");
         }
     }
+
 
     private void rispondiAMessaggioPubblico(List<Messaggio> messaggiDaVisualizzare, Scanner scanner, int idCanale, int idProgetto) {
         Printer.print("\nInserisci il numero del messaggio a cui vuoi rispondere: ");
@@ -494,8 +519,13 @@ public class CapoprogettoView {
 
         Printer.printlnBlu("\nLista di progetti da te coordinati: ");
 
-        // Itera e stampa dei dettagli dei progetti con capoProgetto loggato
-        stampaListaProgetti(progettiCoordinati);
+        if(progettiCoordinati == null || progettiCoordinati.isEmpty()){
+            Printer.errorMessage("Non ci sono progetti coordinati da te al momento");
+            return new Object[0];
+        }else {
+            // Itera e stampa dei dettagli dei progetti con capoProgetto loggato
+            stampaListaProgetti(progettiCoordinati);
+        }
 
         // Chiedi all'utente di scegliere l'ID del progetto
         Printer.print("\nInserisci l'ID del progetto a cui vuoi coordinare i canali: ");
@@ -505,6 +535,8 @@ public class CapoprogettoView {
         // Chiama il metodo di controller che restituisce tutti i canali di tale progetto
         Printer.printlnBlu("\nLista di canali disponibili per il progetto scelto: ");
         List<Canale> canaleList = capoprogettoController.recuperoCanaliPubblici(idProgettoScelto);
+
+        if(canaleList == null) return new Object[0];
 
         // Itera e stampa i canali che appartengono al id progetto scelto
         stampaListaCanali(canaleList);
@@ -516,6 +548,8 @@ public class CapoprogettoView {
         // Lista dei lavoratori che appartiene al progetto scelto
         Printer.printlnBlu("\nLista dei lavoratori appartenenti al progetto scelto: ");
         List<Lavoratore> lavoratoreList = CapoprogettoController.recuperoLavoratori(idProgettoScelto);
+
+        if(lavoratoreList == null) return new Object[0];
 
         // Stampo la lista di lavoratori
         stampaListaLavoratori(lavoratoreList);
@@ -553,8 +587,13 @@ public class CapoprogettoView {
         // Chiama il metodo di controller per restituire i progetti
         progettiCandidati = CapoprogettoController.recuperoProgetti();
 
-        // Itera e stampa dei dettagli dei progetti con capoProgetto loggato
-        stampaListaProgetti(progettiCandidati);
+        // Controllo se la lista è null o vuota
+        if (progettiCandidati == null || progettiCandidati.isEmpty()) {
+            Printer.errorMessage("Non sei associato a nessun progetto al momento.");
+        } else {
+            // Itera e stampa i dettagli dei progetti con capo progetto loggato
+            stampaListaProgetti(progettiCandidati);
+        }
     }
 
 
@@ -599,8 +638,14 @@ public class CapoprogettoView {
         // Chiama il metodo di controller per restituire i progetti
         progettiCandidati = CapoprogettoController.recuperoProgetti();
 
-        // Itera e stampa dei dettagli dei progetti con capoProgetto loggato
-        stampaListaProgetti(progettiCandidati);
+        // Controllo se la lista è null o vuota
+        if (progettiCandidati == null || progettiCandidati.isEmpty()) {
+            Printer.errorMessage("Non sei associato a nessun progetto al momento.");
+            return;
+        } else {
+            // Itera e stampa i dettagli dei progetti con capo progetto loggato
+            stampaListaProgetti(progettiCandidati);
+        }
 
         Scanner input = new Scanner(System.in);
         Printer.print("\nInserisci l'ID del progetto in cui vuoi visualizzare i partecipanti: ");
@@ -612,8 +657,12 @@ public class CapoprogettoView {
         Printer.printlnBlu("\nLista dei lavoratori appartenenti al progetto scelto: ");
         List<Lavoratore> lavoratoreList = CapoprogettoController.recuperoLavoratori(idProgettoScelto);
 
-        // Stampo la lista di lavoratori
-        stampaListaLavoratori(lavoratoreList);
+        if (lavoratoreList == null || lavoratoreList.isEmpty()) {
+            Printer.errorMessage("Non sei associato a nessun canale al momento.");
+        }else {
+            // Stampo la lista di lavoratori
+            stampaListaLavoratori(lavoratoreList);
+        }
     }
 
 
@@ -632,8 +681,14 @@ public class CapoprogettoView {
         // Chiama il metodo di controller per restituire i progetti
         progettiCandidati = CapoprogettoController.recuperoProgetti();
 
-        // Itera e stampa dei dettagli dei progetti con capoProgetto loggato
-        stampaListaProgetti(progettiCandidati);
+        // Controllo se la lista è null o vuota
+        if (progettiCandidati == null || progettiCandidati.isEmpty()) {
+            Printer.errorMessage("Non sei associato a nessun progetto al momento.");
+            return;
+        } else {
+            // Itera e stampa i dettagli dei progetti con capo progetto loggato
+            stampaListaProgetti(progettiCandidati);
+        }
 
         Scanner input = new Scanner(System.in);
         Printer.print("\nInserisci l'ID del progetto in cui vuoi visualizzare i partecipanti: ");
@@ -646,8 +701,13 @@ public class CapoprogettoView {
         Printer.printlnBlu("\nLista di canali disponibili per il progetto scelto: ");
         List<Canale> canaleList = capoprogettoController.recuperoCanali(idProgettoScelto);
 
-        // Itera e stampa i canali che appartengono al id progetto scelto
-        stampaListaCanali(canaleList);
+        if(canaleList == null || canaleList.isEmpty()){
+            Printer.errorMessage("Non sei associato a nessun canale al momento.");
+            return;
+        }else {
+            // Itera e stampa i canali che appartengono al id progetto scelto
+            stampaListaCanali(canaleList);
+        }
 
         Printer.print("\nInserisci l'ID del canale che vuoi visualizzare i partecipanti: ");
         int idCanaleScelto = input.nextInt();
@@ -679,8 +739,14 @@ public class CapoprogettoView {
         // Chiama il metodo di controller per restituire i progetti
         progettiCandidati = CapoprogettoController.recuperoProgetti();
 
-        // Itera e stampa dei dettagli dei progetti con capoProgetto loggato
-        stampaListaProgetti(progettiCandidati);
+        // Controllo se la lista è null o vuota
+        if (progettiCandidati == null || progettiCandidati.isEmpty()) {
+            Printer.errorMessage("Non sei associato a nessun progetto al momento.");
+            return new Object[0];
+        } else {
+            // Itera e stampa i dettagli dei progetti con capo progetto loggato
+            stampaListaProgetti(progettiCandidati);
+        }
 
         Scanner input = new Scanner(System.in);
         Printer.print("\nInserisci l'ID del progetto in cui vuoi assegnare: ");
@@ -694,8 +760,13 @@ public class CapoprogettoView {
         // Recuperare la lista dei lavoratori
         List<Lavoratore> tuttiLavoratori = capoprogettoController.recuperoTuttiLavoratori();
 
-        // Stampo la lista di lavoratori
-        stampaListaLavoratori(tuttiLavoratori);
+        if(tuttiLavoratori == null || tuttiLavoratori.isEmpty()){
+            Printer.errorMessage("Non ci sono lavoratori");
+            return new Object[0];
+        }else {
+            // Stampo la lista di lavoratori
+            stampaListaLavoratori(tuttiLavoratori);
+        }
 
         // Chiedi all'utente di scegliere il lavoratore per numero
         Printer.print("\nInserisci il numero del lavoratore che vuoi assegnare il progetto: ");
@@ -730,8 +801,13 @@ public class CapoprogettoView {
         // Chiama il metodo di controller per restituire i progetti
         progettiCandidati = CapoprogettoController.recuperoProgetti();
 
-        // Itera e stampa dei dettagli dei progetti con capoProgetto loggato
-        stampaListaProgetti(progettiCandidati);
+        // Controllo se la lista è null o vuota
+        if (progettiCandidati == null || progettiCandidati.isEmpty()) {
+            Printer.errorMessage("Non sei associato a nessun progetto al momento.");
+        } else {
+            // Itera e stampa i dettagli dei progetti con capo progetto loggato
+            stampaListaProgetti(progettiCandidati);
+        }
 
         Scanner input = new Scanner(System.in);
         Printer.print("\nInserisci l'ID del progetto: ");

@@ -1,8 +1,8 @@
 package it.uniroma2.dicii.bd.dao.amministratore;
 
+import it.uniroma2.dicii.bd.exception.DAOException;
 import it.uniroma2.dicii.bd.model.Progetto;
 import it.uniroma2.dicii.bd.dao.ConnectionFactory;
-import it.uniroma2.dicii.bd.utils.Printer;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -13,7 +13,7 @@ import java.util.List;
 
 public class PrintListProgettoCapoDAO {
 
-    public static List<Progetto> listaProgettiConCapo(){
+    public static List<Progetto> listaProgettiConCapo() throws DAOException{
 
         ArrayList<Progetto> progettiConCapo = new ArrayList<>();
 
@@ -45,9 +45,8 @@ public class PrintListProgettoCapoDAO {
                 rs.close();
             }
 
-
         } catch(SQLException e){
-            Printer.errorMessage("Errore connesione DB");
+            throw new DAOException();
         }
 
         return progettiConCapo;

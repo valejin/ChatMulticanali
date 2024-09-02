@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
 public class LoginView {
     public static Credentials authenticate() throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        Printer.printlnBlu("***** LOGIN *****");
+        Printer.printlnBlu("********* LOGIN *********");
         Printer.print("CF: ");
         String cf = reader.readLine();
         Printer.print("password: ");

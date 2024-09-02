@@ -17,7 +17,7 @@ import java.util.List;
 
 public class AssegnaCanaleDAO {
 
-    public List<Lavoratore> recuperoLavoratoriByIdProgetto(int idProgetto){
+    public List<Lavoratore> recuperoLavoratoriByIdProgetto(int idProgetto) throws DAOException{
 
         List<Lavoratore> lavoratoreList = new ArrayList<>();
         Connection conn;
@@ -55,13 +55,12 @@ public class AssegnaCanaleDAO {
                     lavoratore.setRuolo(ruolo.getId());  // Se 'ruolo' è int nel modello Lavoratore
 
                     lavoratoreList.add(lavoratore);
-
                 }
+                rs.close();
             }
 
         } catch(SQLException e){
-            Printer.errorMessage("Errore recupero lavoratore by id progetto in DAO");
-            e.printStackTrace();
+            throw new DAOException();
         }
         return lavoratoreList;
     }
@@ -96,7 +95,7 @@ public class AssegnaCanaleDAO {
 
 
     /* Metodo per recuperare la lista dei canali pubblici a cui capo fa parte */
-    public List<Canale> recuperoCanaliPubblici(int idProgetto){
+    public List<Canale> recuperoCanaliPubblici(int idProgetto) throws DAOException{
 
         List<Canale> canaleList = new ArrayList<>();
         Connection conn;
@@ -140,8 +139,7 @@ public class AssegnaCanaleDAO {
             }
 
         } catch(SQLException e){
-            Printer.errorMessage("Errore nell'recupera canali by Id progetto");
-            e.printStackTrace();
+            throw new DAOException();
         }
         return canaleList;
     }

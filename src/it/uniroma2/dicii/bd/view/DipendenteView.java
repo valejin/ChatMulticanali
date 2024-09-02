@@ -17,9 +17,9 @@ import java.util.Scanner;
 public class DipendenteView {
 
     public static void stampaTitolo() {
-        Printer.println("\n************************************");
-        Printer.printlnBlu("*    Benvenuto a ChatMulticanale   *");
-        Printer.println("************************************");
+        Printer.println("\n**************************************");
+        Printer.printlnBlu("*     Benvenuto a ChatMulticanale    *");
+        Printer.println("**************************************");
     }
 
 

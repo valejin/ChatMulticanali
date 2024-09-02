@@ -1,4 +1,5 @@
 package it.uniroma2.dicii.bd.dao.amministratore;
+import it.uniroma2.dicii.bd.exception.DAOException;
 import it.uniroma2.dicii.bd.model.CapoProgetto;
 import it.uniroma2.dicii.bd.model.Progetto;
 import it.uniroma2.dicii.bd.dao.ConnectionFactory;
@@ -9,33 +10,41 @@ import java.util.List;
 
 public class AssegnaCapoProgettoDAO {
 
-    public List<Progetto> listaProgettiSenzaCapo() throws SQLException {
-        // prendo connesione al DB
-        Connection conn = ConnectionFactory.getConnection();
+    public List<Progetto> listaProgettiSenzaCapo() throws DAOException {
 
-        //recupera lista di progetti senza capo
-        CallableStatement cs = conn.prepareCall("{call lista_progetti_senza_capo()}");
-
-        boolean result = cs.execute();
+        Connection conn;
+        CallableStatement cs;
         ArrayList<Progetto> progettiSenzaCapo = new ArrayList<>();
 
+        try {
+            // prendo connesione al DB
+            conn = ConnectionFactory.getConnection();
 
-        // Se la stored procedure restituisce un result set
-        if (result) {
-            ResultSet rs = cs.getResultSet();
-            while (rs.next()) {
-                // Creazione di un nuovo oggetto Progetto
-                Progetto progetto = new Progetto();
-                progetto.setId(rs.getInt("id"));
-                progetto.setNome(rs.getString("Nome"));
-                progetto.setDataInzio(rs.getDate("DataInizio"));
-                progetto.setDataScadenza(rs.getDate("DataScadenza"));
-                progetto.setCapoProgetto(rs.getString("CapoProgetto")); // dovrebbe essere null
+            //recupera lista di progetti senza capo
+            cs = conn.prepareCall("{call lista_progetti_senza_capo()}");
 
-                // Aggiungi il progetto alla lista
-                progettiSenzaCapo.add(progetto);
+            boolean result = cs.execute();
+
+
+            // Se la stored procedure restituisce un result set
+            if (result) {
+                ResultSet rs = cs.getResultSet();
+                while (rs.next()) {
+                    // Creazione di un nuovo oggetto Progetto
+                    Progetto progetto = new Progetto();
+                    progetto.setId(rs.getInt("id"));
+                    progetto.setNome(rs.getString("Nome"));
+                    progetto.setDataInzio(rs.getDate("DataInizio"));
+                    progetto.setDataScadenza(rs.getDate("DataScadenza"));
+                    progetto.setCapoProgetto(rs.getString("CapoProgetto")); // dovrebbe essere null
+
+                    // Aggiungi il progetto alla lista
+                    progettiSenzaCapo.add(progetto);
+                }
+                rs.close();
             }
-            rs.close();
+        }catch(SQLException e){
+            throw new DAOException();
         }
 
         return progettiSenzaCapo;

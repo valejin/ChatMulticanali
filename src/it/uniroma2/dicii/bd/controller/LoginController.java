@@ -2,6 +2,7 @@ package it.uniroma2.dicii.bd.controller;
 
 import it.uniroma2.dicii.bd.exception.DAOException;
 import it.uniroma2.dicii.bd.dao.LoginProcedureDAO;
+import it.uniroma2.dicii.bd.exception.LoginException;
 import it.uniroma2.dicii.bd.model.domain.Credentials;
 import it.uniroma2.dicii.bd.utils.UserSession;
 import it.uniroma2.dicii.bd.view.LoginView;
@@ -28,7 +29,7 @@ public class LoginController implements Controller {
             UserSession session = UserSession.getInstance();
             session.login(cred);
 
-        } catch(DAOException e) {
+        } catch(LoginException e) {
             throw new RuntimeException(e);
         }
     }
