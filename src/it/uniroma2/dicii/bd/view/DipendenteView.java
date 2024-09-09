@@ -27,7 +27,7 @@ public class DipendenteView {
 
         Printer.printlnBlu("\n------- SCEGLI TRA OPERAZIONI ------");
         Printer.println("1) Inserisci messaggio");
-        Printer.println("2) Visualizza conversazione");   // da implementare
+        Printer.println("2) Visualizza conversazione");
         Printer.println("3) Visualizza partecipazione progetti");
         Printer.println("4) Visualizza appartenenza canali");
         Printer.println("5) Visualizza partecipanti del canale");
@@ -345,7 +345,7 @@ public class DipendenteView {
         /* I messaggi sono organizzati in pagine e i capi progetto e dipendenti possono visualizzare,
         una per una, le pagine della conversazione.*/
 
-        // Estrai il primo messaggio dalla lista e recupera il messaggio originale
+        // Recupera il messaggio originale
         Messaggio primoMessaggio = messaggiDaVisualizzare.getFirst();
         Messaggio messaggioOriginario = recuperaMessaggioOriginale(primoMessaggio);
 

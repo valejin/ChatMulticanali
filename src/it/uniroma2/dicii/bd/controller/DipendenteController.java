@@ -21,7 +21,7 @@ public class DipendenteController implements Controller{
     @Override
     public void start() {
 
-        //we connect to the database with the role CapoProgetto
+        //we connect to the database with the role Dipendente
         try {
             ConnectionFactory.changeRole(Role.DIPENDENTE);
         } catch (SQLException e) {
@@ -144,10 +144,8 @@ public class DipendenteController implements Controller{
 
         try {
             // Nel messaggio originario contiene già idCanale e idProgetto
-            // Il messaggio in DB viene identificato da CFMittente, DataInvio e OrarioInvio
             VisualizzaConversazioneDAO.inserisciRisposta(messaggioOriginale, contenutoRisposta, 0);
             Printer.printlnViola("Risposta pubblica inviata con successo.");
-
 
         } catch (DAOException e) {
             Printer.errorMessage("Errore durante l'invio della risposta pubblica.");
@@ -191,9 +189,6 @@ public class DipendenteController implements Controller{
         return messaggioOriginale;
 
     }
-
-
-
 
 
 

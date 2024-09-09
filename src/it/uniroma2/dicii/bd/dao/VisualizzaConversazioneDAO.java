@@ -67,6 +67,7 @@ public class VisualizzaConversazioneDAO {
                     }
                     conversazioni.add(messaggio);
                 }
+                rs.close();
             }
 
         } catch (SQLException e) {
@@ -293,6 +294,7 @@ public class VisualizzaConversazioneDAO {
 
                     canaleList.add(canale);
                 }
+                rs.close();
             }
 
         } catch(SQLException e){

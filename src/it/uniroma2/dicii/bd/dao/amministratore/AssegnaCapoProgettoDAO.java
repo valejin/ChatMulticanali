@@ -17,7 +17,7 @@ public class AssegnaCapoProgettoDAO {
         ArrayList<Progetto> progettiSenzaCapo = new ArrayList<>();
 
         try {
-            // prendo connesione al DB
+            // prendo connessione al DB
             conn = ConnectionFactory.getConnection();
 
             //recupera lista di progetti senza capo

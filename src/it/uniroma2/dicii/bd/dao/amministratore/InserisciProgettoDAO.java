@@ -11,7 +11,7 @@ public class InserisciProgettoDAO{
 
     public void execute(ProgettoBean progettoBean) throws SQLException {
 
-        // prendo connesione al DB
+        // prendo connessione al DB
         Connection conn = ConnectionFactory.getConnection();
 
         CallableStatement cs = conn.prepareCall("{call inserisci_progetto(?,?,?,?,?)}");

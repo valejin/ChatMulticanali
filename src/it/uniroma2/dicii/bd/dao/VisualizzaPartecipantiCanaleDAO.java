@@ -52,8 +52,8 @@ public class VisualizzaPartecipantiCanaleDAO {
                     lavoratore.setRuolo(ruolo.getId());  // Se 'ruolo' è int nel modello Lavoratore
 
                     lavoratoreList.add(lavoratore);
-
                 }
+                rs.close();
             }
 
 

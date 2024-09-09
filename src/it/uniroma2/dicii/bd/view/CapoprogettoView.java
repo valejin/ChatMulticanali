@@ -40,9 +40,6 @@ public class CapoprogettoView {
         Printer.println("8) Visualizza appartenenza canali");
         Printer.println("9) Visualizza partecipanti del progetto");
         Printer.println("10) Visualizza partecipanti del canale");
-
-
-
         Printer.println("0) Quit");
 
 
@@ -171,7 +168,7 @@ public class CapoprogettoView {
 
         Printer.printlnBlu("\n***** INSERISCI UN NUOVO MESSAGGIO *****");
 
-        // L'utente prima devo scegliere il progetto a cui fa parte
+        // L'utente prima deve scegliere il progetto a cui fa parte
         // Poi deve scegliere il canale a cui fa parte per inviare il nuovo messaggio
 
         Printer.printlnBlu("\nLista di progetti a cui fa parte: ");

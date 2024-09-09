@@ -84,7 +84,7 @@ public class CapoprogettoController implements Controller{
 
 
 
-    /* Metodo per recuperare lista di progetti con cf di capoProgetto dato da DB, chiamato da VIEW */
+    /* Metodo per recuperare lista di progetti da DB con cf di capoProgetto dato, chiamato da VIEW */
     public static List<Progetto> recuperoProgetti(){
 
         CreaCanaleDAO creaCanaleDAO = new CreaCanaleDAO();
@@ -127,7 +127,7 @@ public class CapoprogettoController implements Controller{
     /* Metodo per recuperare la lista di canali con id progetto fornito, chiamato da VIEW */
     public List<Canale> recuperoCanali(int idProgetto){
 
-        List<Canale> canaliTarget = null;
+        List<Canale> canaliTarget;
 
         canaliTarget = InserisciMessaggioDAO.recuperaCanaliByIdProgetto(idProgetto);
 
@@ -140,7 +140,7 @@ public class CapoprogettoController implements Controller{
     public List<Canale> recuperoCanaliPubblici(int idProgetto){
 
         AssegnaCanaleDAO assegnaCanaleDAO = new AssegnaCanaleDAO();
-        List<Canale> canaleList = new ArrayList<>();
+        List<Canale> canaleList;
 
         try {
             canaleList = assegnaCanaleDAO.recuperoCanaliPubblici(idProgetto);
@@ -196,7 +196,7 @@ public class CapoprogettoController implements Controller{
 
         VisualizzaConversazioneDAO visualizzaConversazioneDAO = new VisualizzaConversazioneDAO();
         try{
-            // qui viene passato: cfRispondente, dataInvioRispondente, orarioInvioRispondente
+            // qui viene passato: cfRispondente, dataInvioRispondente, orarioInvioRispondente (chiave primaria)
             messaggioOriginale = visualizzaConversazioneDAO.recuperoMessaggioOriginale(cfRispondente, dataInvioRispondente, orarioInvioRispondente);
 
         } catch(DAOException e){

@@ -137,7 +137,7 @@ public class AmministratoreController implements Controller {
 
 
 
-/*------------ Metodo per stampare la lista di candidati per poter essere capi progetti */
+/*------------ Metodo per stampare la lista di capi progetto candidati */
     public List<CapoProgetto> stampaCandidatiCapo(){
         AssegnaCapoProgettoDAO assegnaCapoProgettoDAO = new AssegnaCapoProgettoDAO();
         List<CapoProgetto> listaCandidati = new ArrayList<>();
@@ -185,7 +185,7 @@ public class AmministratoreController implements Controller {
 
 
 
-/* Metodo per inserire lavoratore, chiamato da switch case 5 */
+/*------------ Metodo per inserire lavoratore, chiamato da switch case 5 */
     public void inserisciLavoratore(){
 
         AmministratoreView amministratoreView = new AmministratoreView();

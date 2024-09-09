@@ -18,9 +18,9 @@ public class PrintListProgettoCapoDAO {
         ArrayList<Progetto> progettiConCapo = new ArrayList<>();
 
         try {
-            // connesione al DB
+            // connessione al DB
             Connection conn = ConnectionFactory.getConnection();
-            //recupera lista di progetti senza capo
+            // recupera lista di progetti senza capo
             CallableStatement cs = conn.prepareCall("{call lista_progetti_con_capo()}");
 
             boolean result = cs.execute();

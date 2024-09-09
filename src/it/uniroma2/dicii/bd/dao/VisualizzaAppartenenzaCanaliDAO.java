@@ -54,6 +54,7 @@ public class VisualizzaAppartenenzaCanaliDAO {
 
                     canaleList.add(canale);
                 }
+                rs.close();
             }
 
         } catch(SQLException e){
